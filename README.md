@@ -4,16 +4,16 @@
  2. Clean and process the data into a useable format.
  3. Analyses the data to produce the tables and figures I include in the paper.
 
-		|Data - contains jupyter notebooks used to download and combine US Call Reports into a long panel
-		|__FedRates - interest-rate and term premia time series of various horizons retrieved from FRED
-		|__MacroControls - macroeconomic time series retrieved from FRED
-		|__MacroFinanceUncertainty_202308Update - macroeconomic uncertainty indicators developed by Jurado et al (2015), retrieved from their website
-		|Writing - contains all writing related outputs from the code; currently only tables
-		|__tables - regression tables optimized for input to LaTeX
-		|x13as - seasonal adjustment library downloaded from census.gov to be used with Python
-		|customFunctions.r - custom functions written for convenience in data processing and analysis
-		|Data_* - data processing pipeline. Important to follow in order unless you are sure you know what you are doing
-		|IR Regressions_* - descriptive statistics, figures, and regressions for the paper
+		Data - contains jupyter notebooks used to download and combine US Call Reports into a long panel
+			FedRates - interest-rate and term premia time series of various horizons retrieved from FRED
+			MacroControls - macroeconomic time series retrieved from FRED
+    			MacroFinanceUncertainty_202308Update - macroeconomic uncertainty indicators developed by Jurado et al (2015), retrieved from their website
+		Writing - contains all writing related outputs from the code; currently only tables
+			tables - regression tables optimized for input to LaTeX
+		x13as - seasonal adjustment library downloaded from census.gov to be used with Python
+		customFunctions.r - custom functions written for convenience in data processing and analysis
+		Data_* - data processing pipeline. Important to follow in order unless you are sure you know what you are doing
+		IR Regressions_* - descriptive statistics, figures, and regressions for the paper
 
 ## Questions the paper will answer
 1. What is the impact of interest rates and macroeconomic and interest-rate uncertainty on bank profits?
