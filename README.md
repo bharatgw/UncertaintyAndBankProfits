@@ -15,7 +15,7 @@
 		|Data_* - data processing pipeline. Important to follow in order unless you are sure you know what you are doing
 		|IR Regressions_* - descriptive statistics, figures, and regressions for the paper
 
-## Questions my paper will answer
+## Questions the paper will answer
 1. What is the impact of interest rates and macroeconomic and interest-rate uncertainty on bank profits?
 2. What is the transmission mechanism behind the aforementioned impact?
 3. Is the impact amplified for financially constrained firms?
