@@ -1,0 +1,58 @@
+
+\begin{table}[htbp]
+   \centering
+   \begin{threeparttable}[b]
+      \caption{\label{tab::NNIMUSubsample} NNI and Macroeconomic Uncertainty Regressions for Financially Constrained Banks}
+      \bigskip
+      \begin{tabular}{lccccccc}
+         \toprule
+                                                     & Full Sample                  & $P_{33}\geq$ Maturity Gap    & $P_{66}\leq$ Maturity Gap    & $P_{33}\geq$ Total Assets      & $P_{66}\leq$ Total Assets     & IR Derivatives used           & IR Derivatives unused \\   
+                                                     & (1)                          & (2)                          & (3)                          & (4)                            & (5)                           & (6)                           & (7)\\  
+         \midrule 
+         L(Pi)                                       & 0.5295$^{***}$               & 0.5082$^{***}$               & 0.4671$^{***}$               & 0.4857$^{***}$                 & 0.4963$^{***}$                & 0.4394$^{***}$                & 0.5224$^{***}$\\   
+                                                     & (0.0163)                     & (0.0173)                     & (0.0155)                     & (0.0130)                       & (0.0236)                      & (0.0261)                      & (0.0140)\\   
+         Y3MO                                        & 0.0011$^{***}$               & 0.0010$^{**}$                & 0.0015$^{***}$               & 0.0006$^{*}$                   & 0.0017$^{***}$                & 0.0007                        & 0.0010$^{***}$\\   
+                                                     & (0.0003)                     & (0.0004)                     & (0.0004)                     & (0.0004)                       & (0.0004)                      & (0.0006)                      & (0.0003)\\   
+         EH10-Y3MO                                   & 0.0020$^{***}$               & 0.0019$^{***}$               & 0.0025$^{***}$               & 0.0017$^{**}$                  & 0.0028$^{***}$                & 0.0017$^{*}$                  & 0.0018$^{***}$\\   
+                                                     & (0.0006)                     & (0.0007)                     & (0.0008)                     & (0.0006)                       & (0.0007)                      & (0.0010)                      & (0.0006)\\   
+         TP10                                        & -0.0006$^{*}$                & -0.0006$^{*}$                & -0.0010$^{**}$               & -0.0008$^{**}$                 & -0.0007$^{*}$                 & -0.0004                       & -0.0007$^{**}$\\   
+                                                     & (0.0003)                     & (0.0003)                     & (0.0004)                     & (0.0004)                       & (0.0004)                      & (0.0005)                      & (0.0003)\\   
+         Y3MO squared                                & $1.6\times 10^{-5}$$^{*}$    & $1.72\times 10^{-5}$$^{*}$   & $1.81\times 10^{-5}$$^{*}$   & $2.85\times 10^{-5}$$^{***}$   & $7.24\times 10^{-6}$          & $3.38\times 10^{-5}$$^{**}$   & $1.37\times 10^{-5}$\\    
+                                                     & ($8.81\times 10^{-6}$)       & ($8.78\times 10^{-6}$)       & ($1.03\times 10^{-5}$)       & ($1.08\times 10^{-5}$)         & ($9.05\times 10^{-6}$)        & ($1.32\times 10^{-5}$)        & ($9.22\times 10^{-6}$)\\    
+         (EH10-Y3MO) square                          & $-5.15\times 10^{-5}$$^{*}$  & $-4.74\times 10^{-5}$$^{*}$  & $-5.66\times 10^{-5}$$^{*}$  & $-8.58\times 10^{-5}$$^{***}$  & $-3.34\times 10^{-5}$         & -0.0001$^{**}$                & $-4.03\times 10^{-5}$\\    
+                                                     & ($2.61\times 10^{-5}$)       & ($2.55\times 10^{-5}$)       & ($3.21\times 10^{-5}$)       & ($3.14\times 10^{-5}$)         & ($2.72\times 10^{-5}$)        & ($4.55\times 10^{-5}$)        & ($2.67\times 10^{-5}$)\\    
+         TP10 square                                 & $4.07\times 10^{-5}$         & $2.24\times 10^{-5}$         & $7.87\times 10^{-5}$$^{*}$   & $4.47\times 10^{-5}$           & $3.03\times 10^{-5}$          & 0.0001$^{***}$                & $3.46\times 10^{-5}$\\    
+                                                     & ($3.74\times 10^{-5}$)       & ($3.84\times 10^{-5}$)       & ($4.41\times 10^{-5}$)       & ($4.73\times 10^{-5}$)         & ($3.89\times 10^{-5}$)        & ($4.54\times 10^{-5}$)        & ($3.86\times 10^{-5}$)\\    
+         IRVol                                       & -0.0002                      & -0.0001                      & -0.0002                      & -0.0001                        & -0.0002                       & -0.0002                       & -0.0001\\   
+                                                     & (0.0001)                     & (0.0001)                     & (0.0001)                     & (0.0001)                       & (0.0001)                      & (0.0002)                      & ($9.69\times 10^{-5}$)\\    
+         MacroUncertain                              & -0.0003                      & $-7.17\times 10^{-5}$        & -0.0005                      & -0.0003                        & 0.0002                        & 0.0008                        & -0.0003\\   
+                                                     & (0.0009)                     & (0.0010)                     & (0.0010)                     & (0.0010)                       & (0.0010)                      & (0.0011)                      & (0.0010)\\   
+         Y3MO $\times$ MacroUncertain                & $3.59\times 10^{-5}$         & $-5.18\times 10^{-5}$        & $8.37\times 10^{-5}$         & $6\times 10^{-5}$              & -0.0002                       & -0.0005                       & $5.13\times 10^{-5}$\\    
+                                                     & (0.0003)                     & (0.0003)                     & (0.0003)                     & (0.0003)                       & (0.0003)                      & (0.0003)                      & (0.0003)\\   
+         EH10-Y3MO $\times$ MacroUncertain           & 0.0002                       & 0.0002                       & 0.0003                       & 0.0002                         & $4.42\times 10^{-5}$          & $-1.21\times 10^{-5}$         & 0.0002\\   
+                                                     & (0.0005)                     & (0.0005)                     & (0.0005)                     & (0.0005)                       & (0.0005)                      & (0.0005)                      & (0.0005)\\   
+         TP10 $\times$ MacroUncertain                & -0.0001                      & $-3.35\times 10^{-5}$        & -0.0002                      & $-9.81\times 10^{-5}$          & $3.77\times 10^{-5}$          & 0.0003                        & -0.0001\\   
+                                                     & (0.0003)                     & (0.0003)                     & (0.0003)                     & (0.0003)                       & (0.0003)                      & (0.0003)                      & (0.0003)\\   
+         Y3MO squared $\times$ MacroUncertain        & $1.62\times 10^{-5}$$^{*}$   & $1.93\times 10^{-5}$$^{*}$   & $1.75\times 10^{-5}$$^{*}$   & $4.85\times 10^{-6}$           & $2.91\times 10^{-5}$$^{***}$  & $7.71\times 10^{-5}$$^{***}$  & $8.7\times 10^{-6}$\\    
+                                                     & ($9.27\times 10^{-6}$)       & ($9.77\times 10^{-6}$)       & ($9.09\times 10^{-6}$)       & ($9.66\times 10^{-6}$)         & ($1.03\times 10^{-5}$)        & ($1.8\times 10^{-5}$)         & ($8.91\times 10^{-6}$)\\    
+         (EH10-Y3MO) square $\times$ MacroUncertain  & $-1.7\times 10^{-5}$         & $-2.88\times 10^{-5}$        & $-2.64\times 10^{-5}$        & $-9.3\times 10^{-6}$           & $-4.16\times 10^{-5}$         & -0.0001$^{**}$                & $-9.05\times 10^{-6}$\\    
+                                                     & ($2.91\times 10^{-5}$)       & ($2.95\times 10^{-5}$)       & ($3.15\times 10^{-5}$)       & ($3.01\times 10^{-5}$)         & ($3.28\times 10^{-5}$)        & ($4.94\times 10^{-5}$)        & ($2.79\times 10^{-5}$)\\    
+         TP10 square $\times$ MacroUncertain         & $-4.96\times 10^{-5}$        & $-4.93\times 10^{-5}$        & $-5.33\times 10^{-5}$        & $-4.19\times 10^{-5}$          & $-7.82\times 10^{-5}$         & -0.0001$^{*}$                 & $-2.82\times 10^{-5}$\\    
+                                                     & ($5.28\times 10^{-5}$)       & ($6.41\times 10^{-5}$)       & ($4.42\times 10^{-5}$)       & ($6.03\times 10^{-5}$)         & ($6.18\times 10^{-5}$)        & ($8.36\times 10^{-5}$)        & ($4.8\times 10^{-5}$)\\    
+         Macro Controls                              & $\checkmark$                 & $\checkmark$                 & $\checkmark$                 & $\checkmark$                   & $\checkmark$                  & $\checkmark$                  & $\checkmark$\\   
+         Bank Controls                               & $\checkmark$                 & $\checkmark$                 & $\checkmark$                 & $\checkmark$                   & $\checkmark$                  & $\checkmark$                  & $\checkmark$\\   
+          \\
+         Observations                                & 420,772                      & 139,919                      & 140,332                      & 140,014                        & 140,311                       & 66,798                        & 353,974\\  
+         R$^2$                                       & 0.7269                       & 0.7289                       & 0.7541                       & 0.7193                         & 0.7092                        & 0.6655                        & 0.7347\\  
+         Within R$^2$                                & 0.4151                       & 0.3620                       & 0.3642                       & 0.3545                         & 0.3731                        & 0.3289                        & 0.4023\\  
+          \\
+         Bank fixed effects                          & $\checkmark$                 & $\checkmark$                 & $\checkmark$                 & $\checkmark$                   & $\checkmark$                  & $\checkmark$                  & $\checkmark$\\   
+         \bottomrule
+      \end{tabular}
+      
+      \begin{tablenotes}\item Only selected variable coefficients are reported to conserve space.  Driscoll and Kraay standard errors are estimated and reported assuming residuals are autocorrelated up to the 4\textsuperscript{th} lag.
+      \end{tablenotes}
+   \end{threeparttable}
+\end{table}
+
+

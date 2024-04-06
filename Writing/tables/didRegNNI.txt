@@ -1,0 +1,58 @@
+
+\begin{table}[htbp]
+   \centering
+   \begin{threeparttable}[b]
+      \caption{\label{tab::didRegNNI} Uncertainty Effects on NNI of Financially Constrained Banks}
+      \bigskip
+      \begin{tabular}{lccc}
+         \toprule
+                                                                 & NNI$\times$MatGap             & NNI$\times$AssetSize           & NNI$\times$NoDerivative \\    
+                                                                 & (1)                           & (2)                            & (3)\\  
+         \midrule 
+         g $\times$ L(NNI)                                       & -0.0242$^{**}$                & 0.0014                         & 0.0273$^{**}$\\   
+                                                                 & (0.0117)                      & (0.0176)                       & (0.0128)\\   
+         g $\times$ Y3MO                                         & 0.0005                        & 0.0010$^{***}$                 & 0.0006\\   
+                                                                 & (0.0003)                      & (0.0003)                       & (0.0004)\\   
+         g $\times$ EH10-Y3MO                                    & 0.0006                        & 0.0010$^{*}$                   & 0.0005\\   
+                                                                 & (0.0005)                      & (0.0005)                       & (0.0007)\\   
+         g $\times$ TP10                                         & -0.0003                       & 0.0002                         & -0.0003\\   
+                                                                 & (0.0002)                      & (0.0002)                       & (0.0004)\\   
+         g $\times$ Y3MO squared                                 & $-7.79\times 10^{-7}$         & $-2.24\times 10^{-5}$$^{***}$  & $-2.71\times 10^{-5}$$^{***}$\\    
+                                                                 & ($3.07\times 10^{-6}$)        & ($5.28\times 10^{-6}$)         & ($6.68\times 10^{-6}$)\\    
+         g $\times$ (EH10-Y3MO) square                           & $-1.81\times 10^{-6}$         & $5.31\times 10^{-5}$$^{***}$   & $8.6\times 10^{-5}$$^{***}$\\    
+                                                                 & ($1.16\times 10^{-5}$)        & ($1.49\times 10^{-5}$)         & ($2.74\times 10^{-5}$)\\    
+         g $\times$ TP10 square                                  & $5.35\times 10^{-5}$$^{***}$  & $-2.19\times 10^{-5}$          & -0.0001$^{**}$\\   
+                                                                 & ($1.84\times 10^{-5}$)        & ($2.71\times 10^{-5}$)         & ($4.3\times 10^{-5}$)\\    
+         g $\times$ IRVol                                        & $-2.93\times 10^{-5}$         & $-6.22\times 10^{-5}$          & $7.13\times 10^{-5}$\\    
+                                                                 & ($6.68\times 10^{-5}$)        & ($7.1\times 10^{-5}$)          & (0.0001)\\   
+         g $\times$ MacroUncertain                               & -0.0002                       & 0.0004                         & -0.0014\\   
+                                                                 & (0.0007)                      & (0.0005)                       & (0.0011)\\   
+         g $\times$ Y3MO $\times$ MacroUncertain                 & $3.91\times 10^{-5}$          & -0.0002                        & 0.0006$^{*}$\\   
+                                                                 & (0.0002)                      & (0.0001)                       & (0.0003)\\   
+         g $\times$ EH10-Y3MO $\times$ MacroUncertain            & $7.31\times 10^{-5}$          & $-6.24\times 10^{-5}$          & 0.0004\\   
+                                                                 & (0.0003)                      & (0.0003)                       & (0.0005)\\   
+         g $\times$ TP10 $\times$ MacroUncertain                 & $-5.19\times 10^{-5}$         & $7.79\times 10^{-5}$           & -0.0005\\   
+                                                                 & (0.0002)                      & (0.0002)                       & (0.0003)\\   
+         g $\times$ Y3MO squared $\times$ MacroUncertain         & $2.68\times 10^{-6}$          & $2.39\times 10^{-5}$$^{***}$   & $-6.29\times 10^{-5}$$^{***}$\\    
+                                                                 & ($3.17\times 10^{-6}$)        & ($5.49\times 10^{-6}$)         & ($1.38\times 10^{-5}$)\\    
+         g $\times$ (EH10-Y3MO) square $\times$ MacroUncertain   & $-5.67\times 10^{-6}$         & $-2.72\times 10^{-5}$          & 0.0001$^{***}$\\   
+                                                                 & ($1.14\times 10^{-5}$)        & ($1.93\times 10^{-5}$)         & ($3.45\times 10^{-5}$)\\    
+         g $\times$ TP10 square $\times$ MacroUncertain          & $-1.67\times 10^{-7}$         & $-3.66\times 10^{-5}$          & 0.0001$^{*}$\\   
+                                                                 & ($2.95\times 10^{-5}$)        & ($3.61\times 10^{-5}$)         & ($5.68\times 10^{-5}$)\\    
+         Macro Controls                                          & $\checkmark$                  & $\checkmark$                   & $\checkmark$\\   
+         Bank Controls                                           & $\checkmark$                  & $\checkmark$                   & $\checkmark$\\   
+          \\
+         Observations                                            & 261,205                       & 276,435                        & 420,772\\  
+         R$^2$                                                   & 0.7356                        & 0.7391                         & 0.7277\\  
+         Within R$^2$                                            & 0.3983                        & 0.3917                         & 0.4167\\  
+          \\
+         Bank fixed effects                                      & $\checkmark$                  & $\checkmark$                   & $\checkmark$\\   
+         \bottomrule
+      \end{tabular}
+      
+      \begin{tablenotes}\item This table presents selected estimates of coefficients from Equation (), estimated with a full-dummy set (Slope and Intercept) for each exogenous variable. Driscoll and Kraay standard errors are estimated and reported assuming residuals are autocorrelated up to the 4\textsuperscript{th} lag. First lag of the dependent variable - NNI - is included in each regression and reported. g denotes the 'alternative' group dummy and its definition varies for each column. For columns (1) and (2), g=1 indicates the group of banks each quarter with the highest maturity gap and asset size. For column (3), g=1 indicates the group of banks each quarter which do not use derivatives for trading or hedging. Hence, for each regression specification, a significant coefficient suggests that there is difference between sensitivities of the two groups to changes in the given exogenous variable.
+      \end{tablenotes}
+   \end{threeparttable}
+\end{table}
+
+

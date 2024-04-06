@@ -1,0 +1,126 @@
+
+
+```{r, warning = F}
+library(tidyverse)
+library(tsibble)
+```
+
+```{r Comparing Overlap}
+
+legacyCallReports = read.csv("./Data/legacyCallReports(73-10).csv")
+newCallReports = read.csv("./Data/newCallReports(01-23).csv")
+
+legacyCallReportsPivot = legacyCallReports %>%
+    mutate(RSSD9999 = yearquarter(as.Date(as.character(RSSD9999), format = "%Y%m%d"))) %>%
+    rowwise() %>%
+    mutate(RCFD2170C = median(RCON2170, RCFN2170, na.rm = T), 
+           RCFD3368C = median(RCON3368, RCFN3368, na.rm = T), 
+           IEA = median(RCON0071, RCON2122, RCON0390, RCON2146, RCON3545, RCON1754, RCON1772, RCON1350, RCONB987, RCONB989, na.rm = T)) %>%
+    ungroup() %>%
+    tsibble(index = RSSD9999, key = RSSD9001) %>%
+    fill_gaps() %>%
+    index_by() %>%
+    summarize(meanRCON2170 = median(RCON2170, na.rm = T), 
+              meanRCFD2170 = median(RCFD2170, na.rm = T),
+              meanRCFD2170C = median(RCFD2170C, na.rm = T),
+              meanRCON3368 = median(RCON3368, na.rm = T),
+              meanRCFD3368 = median(RCFD3368, na.rm = T),
+              meanRCFD3368C = median(RCFD3368C, na.rm = T),
+              meanIEA = median(IEA, na.rm = T),
+              meanRCON2948 = median(RCON2948, na.rm = T))  %>%
+    pivot_longer(c(meanRCON2170, meanRCFD2170, meanRCFD2170C, meanRCON3368, meanRCFD3368, meanRCFD3368C, meanIEA, meanRCON2948), "Series")
+
+(newCallReports %>%
+  rename(RSSD9001 = IDRSSD, RSSD9999 = RCON9999) %>%
+  mutate(RSSD9999 = yearquarter(as.Date(as.character(RSSD9999), format = "%Y%m%d"))) %>%
+  rowwise() %>%
+  mutate(IEA = median(RCON0071, RCON2122, RCON3545, RCON1754, RCON1772, RCON1350, RCONB987, RCONB989, na.rm = T)) %>%
+  ungroup() %>%
+  tsibble(index = RSSD9999, key = RSSD9001) %>%
+  fill_gaps() %>%
+  index_by() %>%
+  summarize(meanRCON2170 = median(RCON2170, na.rm = T), 
+          meanRCFD2170 = median(RCFD2170, na.rm = T),
+          meanRCFD2170C = NA,
+          meanRCON3368 = median(RCON3368, na.rm = T),
+          meanRCFD3368 = median(RCFD3368, na.rm = T),
+          meanRCFD3368C = NA,
+          meanIEA = median(IEA, na.rm = T),
+          meanRIAD4340 = median(RIAD4340, na.rm = T),
+          meanRCON2948 = median(RCON2948, na.rm = T))  %>%
+  pivot_longer(c(meanRCON2170, meanRCFD2170, meanRCFD2170C, meanRCON3368, meanRCFD3368, meanRCFD3368C, meanIEA, meanRCON2948), "Series") %>%
+  as_tibble() %>%
+  full_join(as_tibble(legacyCallReportsPivot), by = c("RSSD9999", "Series")) %>%
+  rename(new = value.x, legacy = value.y) %>%
+  pivot_longer(c("new", "legacy"), names_to = "source") %>%
+  arrange(Series, RSSD9999) %>%
+  ggplot(aes(x=RSSD9999)) + geom_line(aes(y = value, color = source)) + facet_wrap(~ Series, ncol = 2, scales = "free")) %>%
+  plotly::ggplotly()
+
+# rm(legacyCallReportsPivot, legacyCallReports, newCallReports)
+```
+
+```{r NA counts}
+findf = read.csv("./Data/finalData/findf_AllSeries.csv") %>%
+  mutate(RSSD9999 = yearquarter(RSSD9999)) %>%
+  as_tsibble(key = RSSD9001, index = RSSD9999) %>%
+  arrange(RSSD9999, RSSD9001)
+
+findf %>%
+  index_by() %>%
+  summarize(nacount = sum(is.na(RIAD4842))) %>%
+  ggplot(aes(x = RSSD9999, y = nacount)) + geom_line()
+
+findf %>%
+  filter(RSSD9001 == sample(findf$RSSD9001, 1)) %>%
+  mutate(across(everything(), .fns = function(x){replace_na(x, 0)})) %>%
+  mutate(series1 = (RCONF055)*4/quarter(RSSD9999)) %>%
+  ggplot(aes(x = RSSD9999)) + geom_line(aes(y = series1), color = "red")
+
+```
+
+```{r Univariate Graphs}
+findf = read.csv("./Data/finalData/findf_RelSeriesContiguous.csv") %>%
+  mutate(RSSD9999 = yearquarter(RSSD9999)) %>%
+  as_tsibble(key = RSSD9001, index = RSSD9999) %>%
+  arrange(RSSD9999, RSSD9001)
+
+for (column in colnames(findf)[4:ncol(findf)]){
+  meanGraph = findf %>%
+  filter_index("1984 Q1"~.) %>%
+  index_by() %>%
+  summarize(meanCol = median(get(column), na.rm = T)) %>%
+  ggplot(aes(x = RSSD9999, y = meanCol)) + geom_line() + ggtitle(column) + theme_classic()
+  
+  print(meanGraph)
+}
+
+rm(findf)
+
+```
+
+
+```{r, Seasonally Adjusted Graphs}
+
+findf = read.csv("./Data/finalData/findf_RelSeriesContiguousSA.csv") %>%
+  select(-RSSD9001.1) %>%
+  mutate(RSSD9999 = yearquarter(RSSD9999), RSSD9001 = as.numeric(RSSD9001)) %>%
+  as_tsibble(key = RSSD9001, index = RSSD9999) %>%
+  arrange(RSSD9999, RSSD9001)
+
+for (column in colnames(findf)[48:ncol(findf)]){
+  meanGraph = findf %>%
+  filter_index("1984 Q1"~.) %>%
+  index_by() %>%
+  summarize(meanCol = as.numeric(median(get(column), na.rm = T))) %>%
+  ggplot(aes(x = RSSD9999, y = meanCol)) + geom_line() + ggtitle(column) + theme_classic()
+  
+  print(meanGraph)
+}
+
+rm(findf)
+
+```
+
+
+

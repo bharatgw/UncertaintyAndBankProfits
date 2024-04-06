@@ -1,0 +1,45 @@
+
+\begin{table}[htbp]
+   \caption{\label{tab::bankProfitMU} Bank Profit and Macroeconomic Uncertainty Regressions}
+   \bigskip
+   \centering
+   \begin{tabular}{lccc}
+      \toprule
+                                                 & NII                            & NNI                            & ROA\\  
+                                                 & (1)                            & (2)                            & (3)\\  
+      \midrule 
+      L(Pi)                                      & 0.7274$^{***}$                 & 0.5306$^{***}$                 & 0.4421$^{***}$\\   
+                                                 & (0.0131)                       & (0.0139)                       & (0.0148)\\   
+      Y3MO                                       & -0.0001$^{*}$                  & 0.0003$^{***}$                 & 0.0001\\   
+                                                 & ($6.29\times 10^{-5}$)         & ($4.9\times 10^{-5}$)          & ($8.54\times 10^{-5}$)\\    
+      Y10-Y3MO                                   & $-4.5\times 10^{-5}$           & 0.0005$^{***}$                 & 0.0007$^{***}$\\   
+                                                 & ($9.48\times 10^{-5}$)         & ($8.17\times 10^{-5}$)         & (0.0002)\\   
+      Y3MO squared                               & $-9.09\times 10^{-6}$$^{**}$   & $1.28\times 10^{-6}$           & $-9.91\times 10^{-6}$$^{*}$\\    
+                                                 & ($3.66\times 10^{-6}$)         & ($3.26\times 10^{-6}$)         & ($5.68\times 10^{-6}$)\\    
+      (Y10-Y3MO) square                          & $-1.84\times 10^{-5}$$^{*}$    & $-1.43\times 10^{-5}$$^{*}$    & $-2.8\times 10^{-5}$$^{*}$\\    
+                                                 & ($9.89\times 10^{-6}$)         & ($7.34\times 10^{-6}$)         & ($1.49\times 10^{-5}$)\\    
+      IRVol                                      & $-8.48\times 10^{-5}$          & -0.0001                        & -0.0003\\   
+                                                 & ($8.79\times 10^{-5}$)         & (0.0001)                       & (0.0002)\\   
+      MacroUncertain                             & -0.0001                        & 0.0001$^{***}$                 & $5.99\times 10^{-5}$\\    
+                                                 & ($8.78\times 10^{-5}$)         & ($3.77\times 10^{-5}$)         & ($7.81\times 10^{-5}$)\\    
+      Y3MO $\times$ MacroUncertain               & $7.06\times 10^{-5}$$^{*}$     & $-6.84\times 10^{-5}$$^{***}$  & $-9.51\times 10^{-5}$\\    
+                                                 & ($4.04\times 10^{-5}$)         & ($2.5\times 10^{-5}$)          & ($5.93\times 10^{-5}$)\\    
+      Y10-Y3MO $\times$ MacroUncertain           & $8.98\times 10^{-5}$$^{**}$    & $2.24\times 10^{-6}$           & 0.0002$^{**}$\\   
+                                                 & ($3.71\times 10^{-5}$)         & ($3.1\times 10^{-5}$)          & ($6.33\times 10^{-5}$)\\    
+      Y3MO squared $\times$ MacroUncertain       & $-1.14\times 10^{-5}$$^{*}$    & $1.19\times 10^{-5}$$^{**}$    & $1.4\times 10^{-5}$\\    
+                                                 & ($6.67\times 10^{-6}$)         & ($5.65\times 10^{-6}$)         & ($1.25\times 10^{-5}$)\\    
+      (Y10-Y3MO) square $\times$ MacroUncertain  & $-2.64\times 10^{-5}$$^{***}$  & $-8.62\times 10^{-6}$          & $-8.16\times 10^{-5}$$^{***}$\\    
+                                                 & ($8.83\times 10^{-6}$)         & ($1.03\times 10^{-5}$)         & ($1.69\times 10^{-5}$)\\    
+      Macro Controls                             & $\checkmark$                   & $\checkmark$                   & $\checkmark$\\   
+      Bank Controls                              & $\checkmark$                   & $\checkmark$                   & $\checkmark$\\   
+       \\
+      Observations                               & 420,772                        & 420,772                        & 420,772\\  
+      R$^2$                                      & 0.8799                         & 0.7267                         & 0.5370\\  
+      Within R$^2$                               & 0.7541                         & 0.4146                         & 0.2983\\  
+       \\
+      Bank fixed effects                         & $\checkmark$                   & $\checkmark$                   & $\checkmark$\\   
+      \bottomrule
+   \end{tabular}
+\end{table}
+
+

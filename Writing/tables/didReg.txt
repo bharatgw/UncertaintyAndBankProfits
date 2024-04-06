@@ -1,0 +1,60 @@
+
+\begin{table}[htbp]
+   \centering
+   \begin{threeparttable}[b]
+      \caption{\label{tab::didReg} Uncertainty Effects on NIM of Financially Constrained Banks}
+      \bigskip
+      \begin{tabular}{lccc}
+         \toprule
+                                                                  & NIMxMatGap                    & NIMxAssetSize                & NIMxNoDerivative \\   
+                                                                  & (1)                           & (2)                          & (3)\\  
+         \midrule 
+         G' $\times$ L(NIM)                                       & 0.3731$^{***}$                & -0.0454                      & -0.0697\\   
+                                                                  & (0.1274)                      & (0.0917)                     & (0.0736)\\   
+         G' $\times$ Y3MO                                         & 0.0006                        & -0.0011$^{**}$               & 0.0007$^{**}$\\   
+                                                                  & (0.0005)                      & (0.0006)                     & (0.0003)\\   
+         G' $\times$ EH10-Y3MO                                    & 0.0009                        & -0.0023$^{**}$               & 0.0015$^{**}$\\   
+                                                                  & (0.0008)                      & (0.0010)                     & (0.0007)\\   
+         G' $\times$ TP10                                         & -0.0008                       & 0.0014$^{**}$                & -0.0008$^{**}$\\   
+                                                                  & (0.0005)                      & (0.0006)                     & (0.0003)\\   
+         G' $\times$ Y3MO squared                                 & $-2.12\times 10^{-5}$         & $-2.41\times 10^{-5}$$^{*}$  & $2.33\times 10^{-5}$\\    
+                                                                  & ($1.33\times 10^{-5}$)        & ($1.41\times 10^{-5}$)       & ($1.41\times 10^{-5}$)\\    
+         G' $\times$ (EH10-Y3MO) square                           & $5.07\times 10^{-5}$          & $2.97\times 10^{-5}$         & $-5.23\times 10^{-5}$\\    
+                                                                  & ($3.79\times 10^{-5}$)        & ($2.85\times 10^{-5}$)       & ($3.68\times 10^{-5}$)\\    
+         G' $\times$ TP10 square                                  & 0.0002$^{*}$                  & $-3.48\times 10^{-5}$        & 0.0002$^{***}$\\   
+                                                                  & ($9.67\times 10^{-5}$)        & ($7.45\times 10^{-5}$)       & ($4.21\times 10^{-5}$)\\    
+         G' $\times$ IRVol                                        & 0.0004$^{***}$                & 0.0003$^{***}$               & -0.0003$^{**}$\\   
+                                                                  & (0.0002)                      & (0.0001)                     & (0.0001)\\   
+         G' $\times$ MacroUncertain                               & -0.0002                       & 0.0010                       & 0.0005\\   
+                                                                  & (0.0010)                      & (0.0012)                     & (0.0010)\\   
+         G' $\times$ L(MatGap)                                    & 0.0007$^{***}$                & $-1.74\times 10^{-5}$        & -0.0003$^{**}$\\   
+                                                                  & (0.0003)                      & (0.0001)                     & (0.0001)\\   
+         G' $\times$ L(LoanShare)                                 & 0.0005                        & -0.0019                      & -0.0034$^{**}$\\   
+                                                                  & (0.0018)                      & (0.0042)                     & (0.0016)\\   
+         G' $\times$ Y3MO $\times$ MacroUncertain                 & $-8.53\times 10^{-5}$         & -0.0003                      & -0.0002\\   
+                                                                  & (0.0003)                      & (0.0003)                     & (0.0003)\\   
+         G' $\times$ EH10-Y3MO $\times$ MacroUncertain            & 0.0004                        & -0.0005                      & -0.0002\\   
+                                                                  & (0.0005)                      & (0.0006)                     & (0.0005)\\   
+         G' $\times$ TP10 $\times$ MacroUncertain                 & 0.0001                        & 0.0002                       & 0.0002\\   
+                                                                  & (0.0003)                      & (0.0004)                     & (0.0003)\\   
+         G' $\times$ Y3MO squared $\times$ MacroUncertain         & $2.76\times 10^{-5}$$^{***}$  & $8.36\times 10^{-7}$         & $1.94\times 10^{-5}$\\    
+                                                                  & ($1.03\times 10^{-5}$)        & ($1.86\times 10^{-5}$)       & ($1.71\times 10^{-5}$)\\    
+         G' $\times$ (EH10-Y3MO) square $\times$ MacroUncertain   & -0.0001$^{***}$               & $2.72\times 10^{-5}$         & $-1.71\times 10^{-5}$\\    
+                                                                  & ($2.88\times 10^{-5}$)        & ($4.81\times 10^{-5}$)       & ($3.59\times 10^{-5}$)\\    
+         G' $\times$ TP10 square $\times$ MacroUncertain          & $8.32\times 10^{-6}$          & $2.55\times 10^{-5}$         & $2.36\times 10^{-6}$\\    
+                                                                  & ($5.77\times 10^{-5}$)        & ($5.71\times 10^{-5}$)       & ($6.16\times 10^{-5}$)\\    
+         Macro Controls                                           &                               &                              & \\  
+         Bank Controls                                            & $\checkmark$                  & $\checkmark$                 & $\checkmark$\\   
+          \\
+         Observations                                             & 208                           & 208                          & 208\\  
+         R$^2$                                                    & 0.9875                        & 0.9826                       & 0.9753\\  
+         Adjusted R$^2$                                           & 0.9840                        & 0.9778                       & 0.9684\\  
+         \bottomrule
+      \end{tabular}
+      
+      \begin{tablenotes}\item This table presents selected estimates of coefficients from Equation (), estimated with a full-dummy set (Slope and Intercept) for each exogenous variable. Macroeconomic controls are excluded since they are invariant for both groups for each quarter. Driscoll and Kraay standard errors are estimated and reported assuming residuals are autocorrelated up to the 4\textsuperscript{th} lag. First lag of the dependent variable - NIM - is included in each regression and reported. G' denotes the 'alternative' group dummy and its definition varies for each column. For columns (1) and (2), G'=1 indicates the group of banks each quarter with the highest maturity gap and asset size. For column (3), G'=1 indicates the group of banks each quarter which do not use derivatives for trading or hedging.
+      \end{tablenotes}
+   \end{threeparttable}
+\end{table}
+
+

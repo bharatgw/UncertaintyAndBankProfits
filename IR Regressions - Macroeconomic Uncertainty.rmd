@@ -1,0 +1,1418 @@
+
+```{r Load packages, include = FALSE}
+library(fixest)
+library(tsibble)
+library(tidyverse)
+library(moments)
+library(lubridate)
+source("customFunctions.r")
+```
+
+# Load and Process Data
+```{r Load and process panel dataframe, include = FALSE}
+
+findf = read.csv("./Data/finalData/findf_RelSeriesContiguousSA.csv") %>%
+  select(-RSSD9001.1) %>%
+  mutate(RSSD9999 = yearquarter(RSSD9999), RSSD9001 = as.numeric(RSSD9001)) %>%
+  as_tsibble(key = RSSD9001, index = RSSD9999) %>%
+  arrange(RSSD9999, RSSD9001)
+
+# Read Treasury Holdings
+treasuryHoldings = read.csv("./Data/bankTreasuryHoldings.csv") %>%
+  mutate(RSSD9999 = yearquarter(RSSD9999), RSSD9001 = as.numeric(RSSD9001)) %>%
+  as_tsibble(key = RSSD9001, index = RSSD9999) %>%
+  arrange(RSSD9999, RSSD9001)
+
+findf = left_join(findf, treasuryHoldings) %>%
+  mutate(treasuryShare = treasurySecurities/totAssets)
+
+```
+
+```{r Filter according to English Criteria and 99th Trim, include = FALSE}
+
+findf = findf %>%
+  mutate(loanShare = totLoans/totAssets, demandDepShare = demandDep/totLiab, savingDepShare = savingDep/totLiab, timeDepShare = timeDep/totLiab, othAssetShare = othAssets/totAssets, othLiabShare = othLiab/totLiab, IRDerivOtherShare = round(IRDerivOther, 0)/IEA, swapsTotalShare = round(swapsTotal, 0)/IEA, IRDerivTradeShare = round(IRDerivTrade, 0)/IEA, swapsFixedShare = round(swapsFixed, 0)/IEA, swapsFloatShare = round(swapsFloat, 0)/IEA, optContBoughtShare = optContBought/IEA, optContSoldShare = optContSold/IEA)
+
+bankVar = c("IEA", "totAssets", "totLiab", "totEquity", "assetMatPeriod", "liabMatPeriod", "matGap", "loanShare", "demandDepShare", "savingDepShare", "timeDepShare", "treasuryShare","othAssetShare", "othLiabShare", "niiRateAnnSeasAdj", "nniRateAnnSeasAdj", "roaAnnSeasAdj", "LoanProvisionSeasAdj", "deltaLogASeasAdj", "IRDerivOtherShare", "IRDerivTradeShare")
+
+dropNAVar = c("totAssets", "matGap", "loanShare", "demandDepShare", "savingDepShare", "othAssetShare", "othLiabShare", "niiRateAnnSeasAdj", "nniRateAnnSeasAdj", "roaAnnSeasAdj", "deltaLogASeasAdj")
+
+findfFinal = findf %>%
+  filter_index("1997 Q2"~.) %>%
+  englishFilter(bankVar) %>%
+  drop_na(dropNAVar)
+
+print(apply(is.na(findfFinal), 2, sum))
+
+```
+
+```{r Dataset sample statistics}
+descriptiveStats = function(series){
+  serMean = round(mean(series, na.rm = T), 2)
+  serSD = round(sd(series, na.rm = T), 2)
+  serQuantiles = round(quantile(series, c(0, 0.25, 0.5, 0.75, 1), na.rm = T), 2)
+  serSkew = round(moments::skewness(series, na.rm = T), 2)
+  serKurt = round(moments::kurtosis(series, na.rm = T), 2)
+  serNonNACount = sum(!is.na(series))
+  
+  serSummaryList = list("Mean" = serMean,
+                        "Min" = serQuantiles[1],
+                        "25th" = serQuantiles[2],
+                        "Median" = serQuantiles[3],
+                        "75th" = serQuantiles[4],
+                        "Max" = serQuantiles[5],
+                        "SD" = serSD,
+                        "Skew" = serSkew,
+                        "Kurt" = serKurt,
+                        "Non NA Observations" = serNonNACount)
+  
+  return(serSummaryList)
+}
+
+bankVar = c("IEA", "totAssets", "totLiab", "totEquity", "assetMatPeriod", "liabMatPeriod", "matGap", "loanShare", "demandDepShare", "savingDepShare", "timeDepShare", "treasuryShare","othAssetShare", "othLiabShare", "niiRateAnnSeasAdj", "nniRateAnnSeasAdj", "roaAnnSeasAdj", "LoanProvisionSeasAdj", "deltaLogASeasAdj", "IRDerivOtherShare", "IRDerivTradeShare")
+
+descStats = findfFinal %>%
+  as_tibble() %>%
+  select(bankVar) %>%
+  mutate(across(ends_with("Share"), .fns = function(x){x*100})) %>%
+  mutate(across(ends_with("SeasAdj"), .fns = function(x){x*100})) %>%
+  apply(2, descriptiveStats) %>%
+  do.call(rbind, .)
+
+descStats = data.frame(apply(descStats, 2, as.numeric), row.names = rownames(descStats))
+descStats[(endsWith(row.names(descStats), "Share") | endsWith(row.names(descStats), "SeasAdj")),1:9] =
+  descStats[(endsWith(row.names(descStats), "Share") | endsWith(row.names(descStats), "SeasAdj")),1:9] %>%
+  mutate(across(everything(), function(x){paste0(x, "%")}))
+
+rownames(descStats) = c("IEA", "Assets", "Liabilities", "Equity", "Asset Duration", "Liability Duration", "Maturity Gap", "Loan Share", "Demand Deposit Share", "Saving Deposit Share", "Time Deposit Share", "Treasury Share", "Other Asset Share", "Other Liability Share", "NIM", "NNI", "ROA", "Loan Provision", "Delta Ln (Assets)", "IR Hedging Derivatives", "IR Trading Derivatives")
+colnames(descStats) = c("Mean", "P0", "P25", "P50", "P75", "P100", "SD", "Skew", "Kurt", "N")
+descStats["N"] = apply(descStats["N"], 1, as.integer)
+
+descStats
+write.csv(descStats, "./Writing/tables/descStats.csv")
+xtable::xtable(descStats)
+
+findfFinal %>%
+  count(RSSD9999) %>%
+  .$n %>%
+  mean()
+
+findfFinal %>%
+  count(RSSD9001) %>%
+  .$n %>%
+  mean()
+
+length(unique(findfFinal$RSSD9001))
+```
+
+```{r Read covariates}
+
+# Fed rates
+dgs2 = read.csv("./Data/FedRates/DGS2.csv", col.names = c("RSSD9999", "DGS2"), col = c(RSSD9999 = "Date")) %>%
+  mutate(DGS2 = as.numeric(DGS2))
+dgs3mo = read.csv("./Data/FedRates/DGS3MO.csv", col.names = c("RSSD9999", "DGS3MO"), col = c(RSSD9999 = "Date")) %>%
+  mutate(DGS3MO = as.numeric(DGS3MO))
+dgs5 = read.csv("./Data/FedRates/DGS5.csv", col.names = c("RSSD9999", "DGS5"), col = c(RSSD9999 = "Date")) %>%
+  mutate(DGS5 = as.numeric(DGS5))
+dgs10 = read.csv("./Data/FedRates/DGS10.csv", col.names = c("RSSD9999", "DGS10"), col = c(RSSD9999 = "Date")) %>%
+  mutate(DGS10 = as.numeric(DGS10))
+t10y3m = read.csv("./Data/FedRates/T10Y3M.csv", col.names = c("RSSD9999", "T10Y3M"), col = c(RSSD9999 = "Date")) %>%
+  mutate(T10Y3M = as.numeric(T10Y3M))
+
+# Exclude emergency meeting on September 17, 2001 due to 9-11
+excludedMeetings = c(date("2001-09-17"))
+fomcMeetings = readxl::read_excel("./Data/FedRates/FOMC_Meetings.xlsx", sheet = "FOMC Meetings") %>%
+  mutate(RSSD9999 = as.Date(Date), FedFundsLB = FedFundsLB*100, FedFundsUB = FedFundsUB*100, `Policy action` = `Policy action`*100) %>%
+  select(-Notes) %>%
+  filter(!RSSD9999 %in% excludedMeetings)
+
+allMeetings = unique(yearquarter(fomcMeetings$RSSD9999))
+rateChangeMeetings = fomcMeetings %>%
+  filter(`Policy action` != 0) %>%
+  .$RSSD9999
+
+fedRates = dgs2 %>%
+  full_join(dgs3mo, by = "RSSD9999") %>%
+  full_join(dgs5, by = "RSSD9999") %>%
+  full_join(dgs10, by = "RSSD9999") %>%
+  full_join(t10y3m, by = "RSSD9999") %>%
+  arrange(RSSD9999) %>%
+  drop_na() %>%
+  mutate(RSSD9999 = yearquarter(RSSD9999)) %>%
+  group_by(RSSD9999) %>%
+  summarize(shortRateVol = sd(DGS3MO, na.rm = T), shortRateKurt = kurtosis(DGS3MO, na.rm = T), across(everything(), mean))
+
+# GDP data
+gdp = read.csv("./Data/MacroControls/GDPC1.csv") %>%
+  rename(RSSD9999 = DATE) %>%
+  mutate(RSSD9999 = yearquarter(RSSD9999), DlogGDP = log(GDPC1) - dplyr::lag(log(GDPC1), 4)) %>%
+  select(RSSD9999, DlogGDP)
+  
+# Unemployment Gap
+unempRate = read.csv("./Data/MacroControls/UNRATE.csv") %>%
+  mutate(DATE = yearquarter(DATE)) %>%
+  group_by(DATE) %>%
+  summarize(UNRATE = mean(UNRATE))
+  
+unGap = read.csv("./Data/MacroControls/NROU.csv") %>%
+  mutate(DATE = yearquarter(DATE)) %>%
+  full_join(unempRate, by = "DATE") %>%
+  mutate(unempGap = UNRATE - NROU) %>%
+  rename(RSSD9999 = DATE) %>%
+  select(RSSD9999, unempGap)
+
+# Inflation
+gdpDeflator = read.csv("./Data/MacroControls/GDPDEF.csv") %>%
+  rename(RSSD9999 = DATE) %>%
+  mutate(RSSD9999 = yearquarter(RSSD9999), DlogDef = log(GDPDEF) - dplyr::lag(log(GDPDEF), 4)) %>%
+  select(RSSD9999, DlogDef)
+
+# House Price Index
+houseIndex = read.csv("./Data/MacroControls/HousePriceIndex.csv") %>%
+  rename(RSSD9999 = DATE, houseIndex = BOGZ1FL075035243Q) %>%
+  mutate(RSSD9999 = yearquarter(RSSD9999), DHI = log(houseIndex) - dplyr::lag(log(houseIndex), 4)) %>%
+  select(RSSD9999, DHI)
+
+# S&P 500 and VIX
+sNpVix = read.csv("./Data/MacroControls/spyVix.csv") %>%
+  rename(RSSD9999 = Date, VIX = X.VIX) %>%
+  mutate(RSSD9999 = yearquarter(RSSD9999)) %>%
+  group_by(RSSD9999) %>%
+  summarize(SPY = last(SPY), VIX = last(VIX)) %>%
+  mutate(DlogSPY = log(SPY) - dplyr::lag(log(SPY), 4)) %>%
+  select(RSSD9999, VIX, DlogSPY)
+
+# 10-year BBB-Treasury Spread
+bbb10Spr = read.csv("./Data/MacroControls/T10BBBSPREAD.csv") %>%
+  rename(RSSD9999 = DATE, BBB10Spr = BAMLC0A4CBBB) %>%
+  mutate(RSSD9999 = yearquarter(RSSD9999), BBB10Spr = as.numeric(BBB10Spr)) %>%
+  group_by(RSSD9999) %>%
+  summarize(BBB10Spr = last(BBB10Spr, na_rm = T))
+
+# Macro uncertainty
+macroUncertain = readxl::read_excel("./Data/MacroFinanceUncertainty_202308Update/MacroUncertaintyToCirculate.xlsx") %>%
+  mutate(RSSD9999 = yearquarter(Date)) %>%
+  select(RSSD9999, `h=3`, `h=12`) %>%
+  mutate(across(`h=3`:last_col(), scale)) %>%
+  group_by(RSSD9999) %>%
+  summarize(across(.cols = everything(), .fns = function(x) mean(x, na.rm = T))) %>%
+  rename(macroFinUnc3 = `h=3`, macroFinUnc12 = `h=12`)
+
+# Monetary policy uncertainty
+mpUncertain = readxl::read_excel("./Data/PolicyUncertainty/US_MPU_Monthly.xlsx", col_names = c("year", "month", "BBDMPUNews", "BBDMPU10"), skip = 1) %>%
+  mutate(RSSD9999 = yearquarter(as.Date(paste(year, month, "1"), format = "%Y %m %d"))) %>%
+  mutate(across(BBDMPUNews:BBDMPU10, scale)) %>%
+  group_by(RSSD9999) %>%
+  summarize(BBDMPUNews = mean(BBDMPUNews, na.rm = T), BBDMPU10 = mean(BBDMPU10, na.rm = T))
+
+# FY = TP + AER
+termPremium = read.csv("./Data/FedRates/KimWrightTP.csv") %>%
+  select("Date", starts_with("THREEFY")) %>%
+  rename_at(vars(starts_with("THREEFYTP")), function(x){gsub("THREEFYTP", "TP", x)}) %>%
+  rename_at(vars(starts_with("THREEFY")), function(x){gsub("THREEFY", "FY", x)}) %>%
+  rename_at(vars(everything()), function(x){gsub("00.B", "", x)}) %>%
+  mutate(RSSD9999 = as.Date(Date, format = "%d %m %Y")) %>%
+  select(RSSD9999, everything()) %>%
+  select(-Date) %>%
+  drop_na()
+
+for (i in 1:10){
+  termPremium[paste0("AER", str_pad(i, 2, pad = 0))] = termPremium[paste0("FY", str_pad(i, 2, pad = 0))] - termPremium[paste0("TP", str_pad(i, 2, pad = 0))]
+}
+
+termPremium = termPremium %>%
+  mutate(RSSD9999 = yearquarter(RSSD9999)) %>%
+  group_by(RSSD9999) %>%
+  summarize(across(FY01:last_col(), mean))
+
+# Short-term rate uncertainty using SPF
+tBill = readxl::read_excel("./Data/SurveyForecasters/Individual_TBILL.xlsx", range = "A1:N8863") %>%
+  mutate(RSSD9999 = paste(YEAR, " Q", QUARTER, sep = "")) %>%
+  mutate(across(.fns = function(x) sub("#N/A", NA, x))) %>%
+  select(RSSD9999, ID, TBILL2, TBILL3, TBILL4, TBILL5, TBILL6) %>%
+  mutate(across(.cols = ID:last_col(), .fns = as.numeric), RSSD9999 = yearquarter(RSSD9999)) %>%
+  drop_na() %>%
+  group_by(RSSD9999) %>%
+  summarize(across(.cols = TBILL2:last_col(), .fns = list("mean" = function(x) mean(x, na.rm = T),
+  "sd" = function(x) sd(x, na.rm = T), 
+  "varcoef" = function(x) sd(x, na.rm = T)/mean(x, na.rm = T),
+  "skew" = function(x) skewness(x, na.rm = T), 
+  "kurt" = function(x) kurtosis(x, na.rm = T)), .names = "{.col}_{.fn}"))
+
+findfFinal = findfFinal %>%
+  left_join(fedRates, by = "RSSD9999") %>%
+  left_join(gdp, by = "RSSD9999") %>%
+  left_join(unGap, by = "RSSD9999") %>%
+  left_join(gdpDeflator, by = "RSSD9999") %>%
+  left_join(houseIndex, by = "RSSD9999") %>%
+  left_join(sNpVix, by = "RSSD9999") %>%
+  left_join(bbb10Spr, by = "RSSD9999") %>%
+  left_join(macroUncertain, by = "RSSD9999") %>%
+  left_join(mpUncertain, by = "RSSD9999") %>%
+  left_join(termPremium, by = "RSSD9999") %>%
+  left_join(tBill, by = "RSSD9999")
+
+# write.csv(findfFinal, "./Data/finalData/finaldf.csv")
+```
+
+```{r Descriptive Analysis}
+
+plotly::ggplotly((macroUncertain %>%
+  ggplot(aes(x = RSSD9999)) + geom_line(aes(y = macroFinUnc12)) + theme_classic()) + ggtitle("Quarterly MU(12)"))
+
+sum(abs(macroUncertain$macroFinUnc12) >= 1)
+dim(macroUncertain)[1]
+
+```
+
+# NII, NNI and Net Income and Macroeconomic Uncertainty
+
+```{r Lag Order}
+
+modAIC = c()
+
+for (i in 0:5){
+  femod = feols(c(niiRateAnnSeasAdj) ~ l(niiRateAnnSeasAdj, 0:i) + DGS3MO + I(AER10-DGS3MO) + TP10 
+                + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2) + shortRateVol + macroFinUnc12 
+                + (DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2))*macroFinUnc12
+               + l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy) 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*DGS3MO 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*I(AER10-DGS3MO)
+               + DlogGDP + unempGap + DlogDef + DHI + VIX + DlogSPY + BBB10Spr | RSSD9001,
+               findfFinal, panel.id = c("RSSD9001", "RSSD9999"))
+  modAIC[i+1] = AIC(femod)
+}
+
+lagOrderOpt = which.min(modAIC) - 1
+print(lagOrderOpt)
+
+rm(femod)
+```
+
+## Macroeconomic Uncertainty
+
+```{r Rename and Control Dicts}
+
+renameDict = c(niiRateAnnSeasAdj = "NII", `l(niiRateAnnSeasAdj,1)` = "L(Pi)", nniRateAnnSeasAdj = "NNI", 
+               `l(nniRateAnnSeasAdj,1)` = "L(Pi)", roaAnnSeasAdj = "ROA", `l(roaAnnSeasAdj,1)` = "L(Pi)", 
+               DGS3MO = "Y3MO", T10Y3M = "Y10-Y3MO",`I(AER10 - DGS3MO)` =  "EH10-Y3MO",`I(DGS3MO^2)` = "Y3MO squared", 
+               `I(T10Y3M^2)` = "(Y10-Y3MO) square",`I((AER10 - DGS3MO)^2)` =  "(EH10-Y3MO) square","I(TP10^2)" = "TP10 square", 
+               macroFinUnc12 = "MacroUncertain", `l(MADummy, 1)` = "L(Merge/Acq)", `l(matGap,1)` = "L(MatGap)", `l(othAssetShare,1)` = "L(OthAssetShare)", 
+               `l(othLiabShare,1)` = "L(OthLiabShare)", `l(demandDepShare,1)` = "L(DemandDepShare)", `l(savingDepShare,1)` = "L(SavingDepShare)", 
+               `l(loanShare,1)` = "L(LoanShare)", `l(log(totAssets),1)` = "L(ln(Assets))", RSSD9001 = "Bank", shortRateVol = "IRVol")
+
+macroCtrl = c("DlogGDP", "unempGap", "DlogDef", "DHI", "VIX", "DlogSPY", "BBB10Spr")
+bankCtrl = c("MatGap", "OthAssetShare", "OthLiabShare", "DemandDepShare", "SavingDepShare", "LoanShare", "Assets", "Merge/Acq")
+
+controlGroups = list("Macro Controls" = macroCtrl, "Bank Controls" = bankCtrl)
+```
+
+```{r Nonlinear interest rate shocks with MU}
+regMod1 = feols(c(niiRateAnnSeasAdj) ~ l(niiRateAnnSeasAdj, 1) + DGS3MO + T10Y3M + I(DGS3MO^2) + I(T10Y3M^2) + shortRateVol
+               + macroFinUnc12*(DGS3MO + T10Y3M + I(DGS3MO^2) + I(T10Y3M^2))
+               + l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy) 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*DGS3MO 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*T10Y3M
+               + DlogGDP + unempGap + DlogDef + DHI + VIX + DlogSPY + BBB10Spr | RSSD9001,
+               findfFinal, vcov = ~RSSD9999+RSSD9001, panel.id = c("RSSD9001", "RSSD9999"))
+
+regMod2 = feols(c(nniRateAnnSeasAdj) ~ l(nniRateAnnSeasAdj, 1) + DGS3MO + T10Y3M + I(DGS3MO^2) + I(T10Y3M^2) + shortRateVol
+               + macroFinUnc12*(DGS3MO + T10Y3M + I(DGS3MO^2) + I(T10Y3M^2))
+               + l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy) 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*DGS3MO 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*T10Y3M
+               + DlogGDP + unempGap + DlogDef + DHI + VIX + DlogSPY + BBB10Spr | RSSD9001,
+               findfFinal, vcov = ~RSSD9999+RSSD9001, panel.id = c("RSSD9001", "RSSD9999"))
+
+regMod3 = feols(c(roaAnnSeasAdj) ~ l(roaAnnSeasAdj, 1) + DGS3MO + T10Y3M + I(DGS3MO^2) + I(T10Y3M^2) + shortRateVol
+               + macroFinUnc12*(DGS3MO + T10Y3M + I(DGS3MO^2) + I(T10Y3M^2))
+               + l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy) 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*DGS3MO 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*T10Y3M
+               + DlogGDP + unempGap + DlogDef + DHI + VIX + DlogSPY + BBB10Spr | RSSD9001,
+               findfFinal, vcov = ~RSSD9999+RSSD9001, panel.id = c("RSSD9001", "RSSD9999"))
+
+etable(regMod1, regMod2, regMod3)
+```
+
+```{r Term Premium and AER with non-linear shocks with MU}
+
+regMod1 = feols(c(niiRateAnnSeasAdj) ~ l(niiRateAnnSeasAdj, 1) + shortRateVol
+               + (DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2))*macroFinUnc12
+               + l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy) 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*DGS3MO 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*I(AER10-DGS3MO)
+               + DlogGDP + unempGap + DlogDef + DHI + VIX + DlogSPY + BBB10Spr | RSSD9001,
+               findfFinal, vcov = DK(4), panel.id = c("RSSD9001", "RSSD9999"))
+
+regMod2 = feols(c(nniRateAnnSeasAdj) ~ l(nniRateAnnSeasAdj, 1) + shortRateVol
+               + (DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2))*macroFinUnc12
+               + l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy) 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*DGS3MO 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*I(AER10-DGS3MO)
+               + DlogGDP + unempGap + DlogDef + DHI + VIX + DlogSPY + BBB10Spr | RSSD9001,
+               findfFinal, vcov = DK(4), panel.id = c("RSSD9001", "RSSD9999"))
+
+regMod3 = feols(c(roaAnnSeasAdj) ~ l(roaAnnSeasAdj, 1) + shortRateVol
+               + (DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2))*macroFinUnc12
+               + l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy) 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*DGS3MO 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*I(AER10-DGS3MO)
+               + DlogGDP + unempGap + DlogDef + DHI + VIX + DlogSPY + BBB10Spr | RSSD9001,
+               findfFinal, vcov = DK(4), panel.id = c("RSSD9001", "RSSD9999"))
+
+etable(regMod1, regMod2, regMod3)
+
+tabTitle = "Bank Profit and Macroeconomic Uncertainty Regressions"
+tablabel = "tab::bankProfitMU"
+tabFile = "./Writing/tables/bankProfitsMUReg.txt"
+
+etable(regMod1, regMod2, regMod3, 
+       digits = 4, digits.stats = 4, 
+       title = tabTitle, label = tablabel,
+       group = controlGroups, dict = renameDict,
+       style.tex = style.tex("aer"), tex = T, file = tabFile, replace = T)
+
+longRunEffect = coef(regMod1)[-1]/(1-coef(regMod1)[1])
+round(longRunEffect, 4)
+
+# Median lag
+muEffectProp = c()
+muEffectProp[1] = coef(regMod1)[9]/longRunEffect[8]
+y = coef(regMod1)[9]
+
+for (i in 2:20){
+  y = coef(regMod1)[1]*y
+  muEffectProp[i] = y/longRunEffect[8]
+}
+
+which(cumsum(muEffectProp) > 0.5)[1]
+
+```
+
+# Interest Rate Uncertainty using Shock Series
+
+```{r Prepare and Add Shock Short-Rate, Slope and TP Shock Series}
+
+fedRate = dgs3mo %>%
+  arrange(RSSD9999) %>%
+  drop_na() %>%
+  mutate(Dr = c(NA, diff(DGS3MO))) %>%
+  filter(RSSD9999 %in% fomcMeetings$RSSD9999) %>%
+  select(-DGS3MO)
+
+fedFundFuturesRate = readxl::read_excel("./Data/FedRates/Daily_FF_Futures_Data.xlsx", sheet = "FF3", range = "A2:B6820", col_names = c("RSSD9999", "FEDFUTURERATE")) %>%
+  mutate(RSSD9999 = as.Date(RSSD9999), FEDFUTURERATE = as.numeric(FEDFUTURERATE)) %>%
+  arrange(RSSD9999) %>%
+  drop_na() %>%
+  mutate(rUAdjust = days_in_month(RSSD9999)/(days_in_month(RSSD9999) - day(RSSD9999)+1) ) %>%
+  mutate(rUAdjust = ifelse(rUAdjust >= 2, 2, rUAdjust) ) %>%
+  mutate(DrU = c(NA, diff(FEDFUTURERATE))*rUAdjust) %>%
+  select(-rUAdjust) %>%
+  filter(RSSD9999 %in% fomcMeetings$RSSD9999) %>%
+  left_join(fedRate) %>%
+  arrange(RSSD9999) %>%
+  mutate(DrE = Dr - DrU) %>%
+  mutate(RSSD9999 = yearquarter(RSSD9999)) %>%
+  group_by(RSSD9999) %>%
+  summarize(across(everything(), function(x){sum(x, na.rm = T)}))
+
+# FY = TP + AER
+termPremium = read.csv("./Data/FedRates/KimWrightTP.csv") %>%
+  select("Date", starts_with("THREEFY")) %>%
+  rename_at(vars(starts_with("THREEFYTP")), function(x){gsub("THREEFYTP", "TP", x)}) %>%
+  rename_at(vars(starts_with("THREEFY")), function(x){gsub("THREEFY", "FY", x)}) %>%
+  rename_at(vars(everything()), function(x){gsub("00.B", "", x)}) %>%
+  mutate(RSSD9999 = as.Date(Date, format = "%d %m %Y")) %>%
+  select(RSSD9999, everything()) %>%
+  select(-Date) %>%
+  drop_na() %>%
+  mutate(across(FY01:last_col(), function(x){c(NA, diff(x))})) %>%
+  filter(RSSD9999 %in% fomcMeetings$RSSD9999)
+
+for (i in 1:10){
+  termPremium[paste0("AER", str_pad(i, 2, pad = 0))] = termPremium[paste0("FY", str_pad(i, 2, pad = 0))] - termPremium[paste0("TP", str_pad(i, 2, pad = 0))]
+}
+
+termPremium = termPremium %>%
+  mutate(RSSD9999 = yearquarter(RSSD9999)) %>%
+  group_by(RSSD9999) %>%
+  summarize(across(FY01:last_col(), sum))
+
+colnames(termPremium)[2:31] = paste("D", colnames(termPremium)[2:31], sep = "_")
+
+findfShock = findfFinal %>%
+  left_join(termPremium, by = "RSSD9999") %>%
+  left_join(fedFundFuturesRate, by = "RSSD9999")
+
+findfShock = findfShock %>%
+  mutate(postPaul = case_when(RSSD9999 <= yearquarter("2007 Q2") ~ 0,
+                              RSSD9999 > yearquarter("2007 Q2") ~ 1))
+
+plotly::ggplotly(fedFundFuturesRate %>%
+  filter(RSSD9999 >= yearquarter("1997 Q2")) %>%
+  ggplot(aes(x = RSSD9999)) + geom_segment(aes(y = DrU, xend = RSSD9999, yend = 0), color = "red") +
+    # geom_segment(aes(y = DrE, xend = RSSD9999, yend = 0)) + 
+    geom_segment(aes(y = Dr, xend = RSSD9999, yend = 0), color = "blue") + theme_classic())
+
+```
+
+```{r NII Impulse Response w MU}
+
+betaDF = data.frame()
+seDF = data.frame()
+
+for (i in 0:10){
+  regMod = feols(I(f(niiRateAnnSeasAdj, i) - l(niiRateAnnSeasAdj)) ~ DrE + DrU + I(D_AER10 - DrU) + D_TP10, findfShock, vcov = DK(4), panel.id = c("RSSD9001", "RSSD9999"))
+  
+  betas = data.frame(DrECoef = coef(regMod)[2],
+                     DrUCoef = coef(regMod)[3],
+                     slopeShockCoef = coef(regMod)[4],
+                     TPShockCoef = coef(regMod)[5])
+  
+  stdErrors = data.frame(DrECoef = se(regMod)[2],
+                         DrUCoef = se(regMod)[3],
+                         slopeShockCoef = se(regMod)[4],
+                         TPShockCoef = se(regMod)[5])
+  
+  betaDF = rbind(betaDF, betas)
+  seDF = rbind(seDF, stdErrors)
+  
+}
+
+colnames(seDF) = paste0(colnames(betaDF), "_SD")
+betaDF["x"] = 0:10
+seDF["x"] = 0:10
+
+niidf = betaDF %>%
+  left_join(seDF, by = "x") %>%
+  mutate(ProfitVar = "NII")
+
+varsEstimated = colnames(select(betaDF, -x))
+z = qt(0.975, 93)
+
+for (varName in varsEstimated){
+  BetaSE = paste0(varName, "_SD")
+  plotgg = niidf %>%
+    mutate(LB = get(varName) - z*get(BetaSE), 
+           UB = get(varName) + z*get(BetaSE)) %>%
+    ggplot(aes(x = 0:10)) + 
+    geom_line(aes_string(y = varName)) + 
+    geom_line(aes_string(y = "LB"), linetype = "dashed") +
+    geom_line(aes_string(y = "UB"), linetype = "dashed") +
+    theme_classic() + geom_line(y = 0) + ggtitle(paste0(varName, ", t+h quarters"))
+  print(plotgg)
+}
+
+```
+
+```{r NNI Impulse Function}
+
+nnibetaDF = data.frame()
+nniseDF = data.frame()
+
+for (i in 0:10){
+  regMod = feols(I(f(nniRateAnnSeasAdj, i) - l(nniRateAnnSeasAdj)) ~ DrE + DrU + I(D_AER10 - DrU) + D_TP10 + D_macroFinUnc12, findfFinal, vcov = ~ RSSD9999, panel.id = c("RSSD9001", "RSSD9999"))
+  
+  betas = data.frame(DrECoef = coef(regMod)[2],
+                     DrUCoef = coef(regMod)[3],
+                     slopeShockCoef = coef(regMod)[4],
+                     TPShockCoef = coef(regMod)[5],
+                     macroUncShockCoef = coef(regMod)[6])
+  
+  stdErrors = data.frame(DrECoef = se(regMod)[2],
+                         DrUCoef = se(regMod)[3],
+                         slopeShockCoef = se(regMod)[4],
+                         TPShockCoef = se(regMod)[5],
+                         macroUncShockCoef = se(regMod)[6])
+  nnibetaDF = rbind(nnibetaDF, betas)
+  nniseDF = rbind(nniseDF, stdErrors)
+  
+}
+
+colnames(nniseDF) = paste0(colnames(nnibetaDF), "_SD")
+nnibetaDF["x"] = 0:10
+nniseDF["x"] = 0:10
+
+nnidf = nnibetaDF %>%
+  left_join(nniseDF, by = "x") %>%
+  mutate(ProfitVar = "NNI")
+
+varsEstimated = colnames(select(nnibetaDF, -x))
+z = qt(0.975, 93)
+
+for (varName in varsEstimated){
+  BetaSE = paste0(varName, "_SD")
+  plotgg = nnidf %>%
+    mutate(LB = get(varName) - z*get(BetaSE), 
+           UB = get(varName) + z*get(BetaSE)) %>%
+    ggplot(aes(x = 0:10)) + 
+    geom_line(aes_string(y = varName)) + 
+    geom_line(aes_string(y = "LB"), linetype = "dashed") +
+    geom_line(aes_string(y = "UB"), linetype = "dashed") +
+    theme_classic() + geom_line(y = 0) + ggtitle(paste0(varName, ", t+h quarters"))
+  print(plotgg)
+}
+```
+
+```{r ROA Impulse Function}
+
+roabetaDF = data.frame()
+roaseDF = data.frame()
+
+for (i in 0:10){
+  regMod = feols(I(f(roaAnnSeasAdj, i) - l(roaAnnSeasAdj)) ~ DrE + DrU + I(D_AER10 - DrU) + D_TP10 + D_macroFinUnc12, findfFinal, vcov = ~RSSD9999, panel.id = c("RSSD9001", "RSSD9999"))
+  
+  betas = data.frame(DrECoef = coef(regMod)[2],
+                     DrUCoef = coef(regMod)[3],
+                     slopeShockCoef = coef(regMod)[4],
+                     TPShockCoef = coef(regMod)[5],
+                     macroUncShockCoef = coef(regMod)[6])
+  
+  stdErrors = data.frame(DrECoef = se(regMod)[2],
+                         DrUCoef = se(regMod)[3],
+                         slopeShockCoef = se(regMod)[4],
+                         TPShockCoef = se(regMod)[5],
+                         macroUncShockCoef = se(regMod)[6])
+  roabetaDF = rbind(roabetaDF, betas)
+  roaseDF = rbind(roaseDF, stdErrors)
+  
+}
+
+colnames(roaseDF) = paste0(colnames(roabetaDF), "_SD")
+roabetaDF["x"] = 0:10
+roaseDF["x"] = 0:10
+
+roadf = roabetaDF %>%
+  left_join(roaseDF, by = "x") %>%
+  mutate(ProfitVar = "ROA")
+
+varsEstimated = colnames(select(roabetaDF, -x))
+z = qt(0.975, 93)
+
+for (varName in varsEstimated){
+  BetaSE = paste0(varName, "_SD")
+  plotgg = roadf %>%
+    mutate(LB = get(varName) - z*get(BetaSE), 
+           UB = get(varName) + z*get(BetaSE)) %>%
+    ggplot(aes(x = 0:10)) + 
+    geom_line(aes_string(y = varName)) + 
+    geom_line(aes_string(y = "LB"), linetype = "dashed") +
+    geom_line(aes_string(y = "UB"), linetype = "dashed") +
+    theme_classic() + geom_line(y = 0) + ggtitle(paste0(varName, ", t+h quarters"))
+  print(plotgg)
+}
+```
+
+```{r Graphs}
+
+jointDF = rbind(niidf, nnidf, roadf)
+
+coefDF = jointDF %>%
+  rename(h = x) %>%
+  select(h, ProfitVar, ends_with("Coef")) %>%
+  pivot_longer(ends_with("Coef"), names_to = "ExVar", values_to = "Coef") %>%
+  mutate(ExVar = gsub("Coef", "", ExVar))
+
+sdDF =  jointDF %>%
+  rename(h = x) %>%
+  select(h, ProfitVar, ends_with("_SD")) %>%
+  pivot_longer(ends_with("_SD"), names_to = "ExVar", values_to = "SD") %>%
+  mutate(ExVar = gsub("Coef_SD", "", ExVar))
+
+jointDF = coefDF %>%
+  left_join(sdDF) %>%
+  mutate(ExVar = gsub("DrE", "beta[1]", ExVar)) %>%
+  mutate(ExVar = gsub("DrU", "beta[2]", ExVar)) %>%
+  mutate(ExVar = gsub("macroUncShock", "beta[5]", ExVar)) %>%
+  mutate(ExVar = gsub("slopeShock", "beta[3]", ExVar)) %>%
+  mutate(ExVar = gsub("TPShock", "beta[4]", ExVar)) %>%
+  arrange(ExVar)
+
+z = qt(0.975, 93)
+jointDF %>%
+  ggplot(aes(x = h)) + geom_line(aes(y = Coef), color = "blue") + 
+  geom_line(aes(y = Coef + z*SD), linetype = "dashed", color = "blue") + geom_line(aes(y = Coef - z*SD), linetype = "dashed", color = "blue") + 
+  geom_line(y = 0) +
+  facet_grid(ProfitVar ~ ExVar, scales = "free_y", switch = "y", labeller = label_parsed) + theme_bw() + ylab(NULL) + xlab("Quarters (h)")
+
+```
+
+
+# Full Sample Explanatory
+
+```{r Rename and Control Dicts}
+
+renameDict = c(niiRateAnnSeasAdj = "NII", `l(niiRateAnnSeasAdj,1)` = "L(Pi)", nniRateAnnSeasAdj = "NNI", 
+               `l(nniRateAnnSeasAdj,1)` = "L(Pi)", roaAnnSeasAdj = "ROA", `l(roaAnnSeasAdj,1)` = "L(Pi)",
+               `l(LoanProvisionSeasAdj,1)` = "L(LoanLossProvision)", `l(intIncLoansSeasAdj,1)` = "L(IntIncLoans)", `l(treasuryShare,1)` = "L(TreasuryShare)",
+               DGS3MO = "Y3MO", T10Y3M = "Y10-Y3MO",`I(AER10 - DGS3MO)` =  "EH10-Y3MO",`I(DGS3MO^2)` = "Y3MO squared", 
+               `I(T10Y3M^2)` = "(Y10-Y3MO) square",`I((AER10 - DGS3MO)^2)` =  "(EH10-Y3MO) square","I(TP10^2)" = "TP10 square", 
+               macroFinUnc12 = "MacroUncertain", `l(MADummy, 1)` = "L(Merge/Acq)", `l(matGap,1)` = "L(MatGap)", `l(othAssetShare,1)` = "L(OthAssetShare)", 
+               `l(othLiabShare,1)` = "L(OthLiabShare)", `l(demandDepShare,1)` = "L(DemandDepShare)", `l(savingDepShare,1)` = "L(SavingDepShare)", 
+               `l(loanShare,1)` = "L(LoanShare)", `l(log(totAssets),1)` = "L(ln(Assets))", RSSD9001 = "Bank", shortRateVol = "IRVol")
+
+macroCtrl = c("DlogGDP", "unempGap", "DlogDef", "DHI", "VIX", "DlogSPY", "BBB10Spr")
+bankCtrl = c("OthAssetShare", "OthLiabShare", "DemandDepShare", "SavingDepShare", "Assets", "Merge/Acq")
+
+controlGroups = list("Macro Controls" = macroCtrl, "Bank Controls" = bankCtrl)
+```
+
+```{r Explanatory Reg}
+loanShare = feols(loanShare ~ l(loanShare, 1) + DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2) + shortRateVol + macroFinUnc12
+                + (DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2))*macroFinUnc12
+               + l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy) 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*DGS3MO 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*I(AER10-DGS3MO)
+               + DlogGDP + unempGap + DlogDef + DHI + VIX + DlogSPY + BBB10Spr | RSSD9001,
+               findfFinal, vcov = DK(4), panel.id = c("RSSD9001", "RSSD9999"))
+
+loanLossProvisions = feols(LoanProvisionSeasAdj ~ l(LoanProvisionSeasAdj, 1) + DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2) + shortRateVol + macroFinUnc12 
+                + (DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2))*macroFinUnc12
+               + l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy) 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*DGS3MO 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*I(AER10-DGS3MO)
+               + DlogGDP + unempGap + DlogDef + DHI + VIX + DlogSPY + BBB10Spr | RSSD9001,
+               findfFinal, vcov = DK(4), panel.id = c("RSSD9001", "RSSD9999"))
+
+maturityGap = feols(matGap ~ l(matGap, 1) + DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2) + shortRateVol + macroFinUnc12 
+                + (DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2))*macroFinUnc12
+               + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy) 
+               + (l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*DGS3MO 
+               + (l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*I(AER10-DGS3MO)
+               + DlogGDP + unempGap + DlogDef + DHI + VIX + DlogSPY + BBB10Spr | RSSD9001,
+               findfFinal, vcov = DK(4), panel.id = c("RSSD9001", "RSSD9999"))
+
+loanIncome = feols(intIncLoansSeasAdj ~ l(intIncLoansSeasAdj, 1) + DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2) + shortRateVol + macroFinUnc12 
+                + (DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2))*macroFinUnc12
+               + l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy) 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*DGS3MO 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*I(AER10-DGS3MO)
+               + DlogGDP + unempGap + DlogDef + DHI + VIX + DlogSPY + BBB10Spr | RSSD9001,
+               findfFinal, vcov = DK(4), panel.id = c("RSSD9001", "RSSD9999"))
+
+treasurySec = feols(treasuryShare ~ l(treasuryShare, 1) + DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2) + shortRateVol + macroFinUnc12 
+                + (DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2))*macroFinUnc12
+               + l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy) 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*DGS3MO 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*I(AER10-DGS3MO)
+               + DlogGDP + unempGap + DlogDef + DHI + VIX + DlogSPY + BBB10Spr | RSSD9001,
+               findfFinal, vcov = DK(4), panel.id = c("RSSD9001", "RSSD9999"))
+
+etable(loanShare, loanLossProvisions, maturityGap, loanIncome, treasurySec,
+       digits = 4, digits.stats = 4, 
+       title = tabTitle, label = tablabel, headers = headerLine,
+       group = controlGroups, dict = renameDict, depvar = F, drop = "Y3MO\\sx.+")
+
+tabTitle = "Explanatory Channel Regressions for Macroeconomic Uncertainty"
+tablabel = "tab::explainReg"
+tabFile = "./Writing/tables/explanatoryReg.txt"
+tabNotes = "Only selected variable coefficients are reported to conserve space.  Driscoll and Kraay standard errors are estimated and reported assuming residuals are autocorrelated up to the 4\\textsuperscript{th} lag. First lags of all dependent variables are included in their respective regression and reported."
+headerLine = c("LoanShare", "LoanLossProvision", "MatGap", "IntIncLoans", "TreasuryShare")
+
+etable(loanShare, loanLossProvisions, maturityGap, loanIncome, treasurySec,
+       digits = 4, digits.stats = 4, 
+       title = tabTitle, label = tablabel, headers = headerLine, notes = tabNotes,
+       group = controlGroups, dict = renameDict, depvar = F,
+       style.tex = style.tex("aer"), tex = T, file = tabFile, replace = T, tpt = T, drop = "Y3MO\\sx.+")
+
+longRunEffect = coef(treasurySec)[-1]/(1-coef(treasurySec)[1])
+round(longRunEffect, 4)
+```
+
+# Subsample Regressions
+
+```{r Rename Dict}
+renameDict = c(niiRateAnnSeasAdj = "NII", `l(niiRateAnnSeasAdj,1)` = "L(Pi)", nniRateAnnSeasAdj = "NNI", 
+               `l(nniRateAnnSeasAdj,1)` = "L(Pi)", roaAnnSeasAdj = "ROA", `l(roaAnnSeasAdj,1)` = "L(Pi)",
+               `l(LoanProvisionSeasAdj,1)` = "L(LoanLossProvision)", `l(intIncLoansSeasAdj,1)` = "L(IntIncLoans)", `l(treasuryShare,1)` = "L(TreasuryShare)",
+               DGS3MO = "Y3MO", T10Y3M = "Y10-Y3MO",`I(AER10 - DGS3MO)` =  "EH10-Y3MO",`I(DGS3MO^2)` = "Y3MO squared", 
+               `I(T10Y3M^2)` = "(Y10-Y3MO) square",`I((AER10 - DGS3MO)^2)` =  "(EH10-Y3MO) square","I(TP10^2)" = "TP10 square", 
+               macroFinUnc12 = "MacroUncertain", `l(MADummy, 1)` = "L(Merge/Acq)", `l(matGap,1)` = "L(MatGap)", `l(othAssetShare,1)` = "L(OthAssetShare)", 
+               `l(othLiabShare,1)` = "L(OthLiabShare)", `l(demandDepShare,1)` = "L(DemandDepShare)", `l(savingDepShare,1)` = "L(SavingDepShare)", 
+               `l(loanShare,1)` = "L(LoanShare)", `l(log(totAssets),1)` = "L(ln(Assets))", RSSD9001 = "Bank", shortRateVol = "IRVol")
+
+macroCtrl = c("DlogGDP", "unempGap", "DlogDef", "DHI", "VIX", "DlogSPY", "BBB10Spr")
+bankCtrl = c("LoanShare", "MatGap","OthAssetShare", "OthLiabShare", "DemandDepShare", "SavingDepShare", "Assets", "Merge/Acq")
+
+controlGroups = list("Macro Controls" = macroCtrl, "Bank Controls" = bankCtrl)
+```
+
+
+```{r Create Financially Constrained Bank Quarter Obs}
+
+findfFinalBuckets = findfFinal %>%
+  mutate(across(starts_with(c("IR", "swaps", "opt")), function(x){round(x, 0)})) %>%
+  index_by() %>%
+  mutate(matGapBuckets = ntile(matGap, 3), assetSizeBuckets = ntile(totAssets, 3)) %>%
+  ungroup() %>%
+  mutate(noDerivFQ = as.numeric((IRDerivOther == 0) & (IRDerivTrade == 0)))
+
+# write.csv(findfFinalBuckets, "./Data/finalData/finaldf.csv")
+
+```
+
+## NIM
+
+```{r Financially Constrained Bank with Obs Slope}
+
+
+fullSample = feols(c(niiRateAnnSeasAdj) ~ l(niiRateAnnSeasAdj, 1:4) + DGS3MO + T10Y3M + I(DGS3MO^2) + I(T10Y3M^2) + shortRateVol + macroFinUnc12 
+                + (DGS3MO + T10Y3M + I(DGS3MO^2) + I(T10Y3M^2))*macroFinUnc12
+               + l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy) 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*DGS3MO 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*I(AER10-DGS3MO)
+               + DlogGDP + unempGap + DlogDef + DHI + VIX + DlogSPY + BBB10Spr | RSSD9001,
+               findfFinalBuckets, vcov = ~RSSD9999, panel.id = c("RSSD9001", "RSSD9999"))
+
+highMatGap = feols(c(niiRateAnnSeasAdj) ~ l(niiRateAnnSeasAdj, 1:4) + DGS3MO + T10Y3M + I(DGS3MO^2) + I(T10Y3M^2) + shortRateVol + macroFinUnc12 
+                + (DGS3MO + T10Y3M + I(DGS3MO^2) + I(T10Y3M^2))*macroFinUnc12
+               + l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy) 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*DGS3MO 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*I(AER10-DGS3MO)
+               + DlogGDP + unempGap + DlogDef + DHI + VIX + DlogSPY + BBB10Spr | RSSD9001,
+               findfFinalBuckets, vcov = ~RSSD9999, split = ~matGapBuckets %keep% c("1", "3"), panel.id = c("RSSD9001", "RSSD9999"))
+
+smallBank = feols(c(niiRateAnnSeasAdj) ~ l(niiRateAnnSeasAdj, 1:4) + DGS3MO + T10Y3M + I(DGS3MO^2) + I(T10Y3M^2) + shortRateVol + macroFinUnc12 
+                + (DGS3MO + T10Y3M + I(DGS3MO^2) + I(T10Y3M^2))*macroFinUnc12
+               + l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy) 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*DGS3MO 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*I(AER10-DGS3MO)
+               + DlogGDP + unempGap + DlogDef + DHI + VIX + DlogSPY + BBB10Spr | RSSD9001,
+               findfFinalBuckets, vcov = ~RSSD9999, split = ~assetSizeBuckets %keep% c("1", "3"), panel.id = c("RSSD9001", "RSSD9999"))
+
+noDeriv = feols(c(niiRateAnnSeasAdj) ~ l(niiRateAnnSeasAdj, 1:4) + DGS3MO + T10Y3M + I(DGS3MO^2) + I(T10Y3M^2) + shortRateVol + macroFinUnc12 
+                + (DGS3MO + T10Y3M + I(DGS3MO^2) + I(T10Y3M^2))*macroFinUnc12
+               + l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy) 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*DGS3MO 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*I(AER10-DGS3MO)
+               + DlogGDP + unempGap + DlogDef + DHI + VIX + DlogSPY + BBB10Spr | RSSD9001,
+               findfFinalBuckets, vcov = ~RSSD9999, split = ~noDerivFQ, panel.id = c("RSSD9001", "RSSD9999"))
+
+renameDict = c(niiRateAnnSeasAdj = "NII", intIncomeRateAnnSeasAdj = "Interest Income", intExpenseRateAnnSeasAdj = "Interest Expense", nniRateAnnSeasAdj = "NNI", roaAnnSeasAdj = "ROA", DGS3MO = "Y\\textsuperscript{3MO}", T10Y3M = "(Y\\textsuperscript{10}--Y\\textsuperscript{3MO})", `I(DGS3MO^2)` = "Y\\textsuperscript{3MO} square", `I(T10Y3M^2)` = "(Y\\textsuperscript{10}--Y\\textsuperscript{3MO}) square", macroFinUnc12 = "MacroUncertain", `l(l(MADummy), 1)` = "L(Merge/Acq)", `l(matGap,1)` = "L(MatGap)", `l(othAssetShare,1)` = "L(OthAssetShare)", `l(othLiabShare,1)` = "L(OthLiabShare)", `l(demandDepShare,1)` = "L(DemandDepShare)", `l(savingDepShare,1)` = "L(SavingDepShare)", `l(loanShare,1)` = "L(LoanShare)", `l(log(totAssets),1)` = "L(ln(Assets))", RSSD9001 = "Bank", shortRateVol = "$\\sigma$", `I(AER10-DGS3MO)` = "(EH\\textsuperscript{10}--Y\\textsuperscript{3MO})", `(AER10-DGS3MO)` = "(EH\\textsuperscript{10}--Y\\textsuperscript{3MO})", TP10 = "TP\\textsuperscript{10}", `I((AER10-DGS3MO)^2)` = "(EH\\textsuperscript{10}--Y\\textsuperscript{3MO}) square", `I(TP10^2)` = "TP\\textsuperscript{10} square")
+
+headerLine = c("Full Sample", "$\\leq P_{10}$ Maturity Gap", "$\\geq P_{90}$ Maturity Gap", "$\\leq P_{10}$ Total Assets", "$\\geq P_{90}$ Total Assets", "IR Derivatives used", "IR Derivatives unused")
+
+controlGroups = list("Macroeconomic Controls" = c("DlogGDP", "unempGap", "DlogDef", "DHI", "VIX", "DlogSPY", "BBB10Spr"), "Bank Controls" = c("^L"))
+
+
+etable(fullSample, highMatGap, smallBank, noDeriv)
+```
+
+```{r Financially Constrained Banks w Decomp Slope}
+
+fullSample = feols(c(niiRateAnnSeasAdj) ~ l(niiRateAnnSeasAdj, 1) + DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2) + shortRateVol + macroFinUnc12 
+                + (DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2))*macroFinUnc12
+               + l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy) 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*DGS3MO 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*I(AER10-DGS3MO)
+               + DlogGDP + unempGap + DlogDef + DHI + VIX + DlogSPY + BBB10Spr | RSSD9001,
+               findfFinalBuckets, vcov = DK(4), panel.id = c("RSSD9001", "RSSD9999"))
+
+highMatGap = feols(c(niiRateAnnSeasAdj) ~ l(niiRateAnnSeasAdj, 1) + DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2) + shortRateVol + macroFinUnc12 
+                + (DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2))*macroFinUnc12
+               + l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy) 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*DGS3MO 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*I(AER10-DGS3MO)
+               + DlogGDP + unempGap + DlogDef + DHI + VIX + DlogSPY + BBB10Spr | RSSD9001,
+               findfFinalBuckets, vcov = DK(4), split = ~matGapBuckets %keep% c("1", "3"), panel.id = c("RSSD9001", "RSSD9999"))
+
+smallBank = feols(c(niiRateAnnSeasAdj) ~ l(niiRateAnnSeasAdj, 1) + DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2) + shortRateVol + macroFinUnc12 
+                + (DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2))*macroFinUnc12
+               + l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy) 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*DGS3MO 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*I(AER10-DGS3MO)
+               + DlogGDP + unempGap + DlogDef + DHI + VIX + DlogSPY + BBB10Spr | RSSD9001,
+               findfFinalBuckets, vcov = DK(4), split = ~assetSizeBuckets %keep% c("1", "3"), panel.id = c("RSSD9001", "RSSD9999"))
+
+noDeriv = feols(c(niiRateAnnSeasAdj) ~ l(niiRateAnnSeasAdj, 1) + DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2) + shortRateVol + macroFinUnc12 
+                + (DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2))*macroFinUnc12
+               + l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy) 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*DGS3MO 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*I(AER10-DGS3MO)
+               + DlogGDP + unempGap + DlogDef + DHI + VIX + DlogSPY + BBB10Spr | RSSD9001,
+               findfFinalBuckets, vcov = DK(4), split = ~noDerivFQ, panel.id = c("RSSD9001", "RSSD9999"))
+
+etable(fullSample, highMatGap, smallBank, noDeriv,
+       digits = 4, digits.stats = 4, 
+       title = tabTitle, label = tablabel, headers = headerLine,
+       group = controlGroups, dict = renameDict, depvar = F)
+
+tabTitle = "NIM and Macroeconomic Uncertainty Regressions for Financially Constrained Banks"
+tablabel = "tab::bankProfitMUSubsample"
+tabFile = "./Writing/tables/bankProfitsMURegSubsample.txt"
+tabNotes = "Only selected variable coefficients are reported to conserve space.  Driscoll and Kraay standard errors are estimated and reported assuming residuals are autocorrelated up to the 4\\textsuperscript{th} lag."
+headerLine = c("Full Sample", "$\\leq P_{10}$ Maturity Gap", "$\\geq P_{90}$ Maturity Gap", "$\\leq P_{10}$ Total Assets", "$\\geq P_{90}$ Total Assets", "IR Derivatives used", "IR Derivatives unused")
+
+etable(fullSample, highMatGap, smallBank, noDeriv,
+       digits = 4, digits.stats = 4, 
+       title = tabTitle, label = tablabel, headers = headerLine, notes = tabNotes,
+       group = controlGroups, dict = renameDict, depvar = F,
+       style.tex = style.tex("aer"), tex = T, file = tabFile, replace = T, tpt = T)
+
+longRunEffect = coef(regMod1)[-1]/(1-coef(regMod1)[1])
+round(longRunEffect, 4)
+
+```
+
+## NNI
+```{r Financially Constrained Banks w Decomp Slope}
+
+fullSample = feols(c(nniRateAnnSeasAdj) ~ l(nniRateAnnSeasAdj, 1) + DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2) + shortRateVol + macroFinUnc12 
+                + (DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2))*macroFinUnc12
+               + l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy) 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*DGS3MO 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*I(AER10-DGS3MO)
+               + DlogGDP + unempGap + DlogDef + DHI + VIX + DlogSPY + BBB10Spr | RSSD9001,
+               findfFinalBuckets, vcov = DK(4), panel.id = c("RSSD9001", "RSSD9999"))
+
+highMatGap = feols(c(nniRateAnnSeasAdj) ~ l(nniRateAnnSeasAdj, 1) + DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2) + shortRateVol + macroFinUnc12 
+                + (DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2))*macroFinUnc12
+               + l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy) 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*DGS3MO 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*I(AER10-DGS3MO)
+               + DlogGDP + unempGap + DlogDef + DHI + VIX + DlogSPY + BBB10Spr | RSSD9001,
+               findfFinalBuckets, vcov = DK(4), split = ~matGapBuckets %keep% c("1", "3"), panel.id = c("RSSD9001", "RSSD9999"))
+
+smallBank = feols(c(nniRateAnnSeasAdj) ~ l(nniRateAnnSeasAdj, 1) + DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2) + shortRateVol + macroFinUnc12 
+                + (DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2))*macroFinUnc12
+               + l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy) 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*DGS3MO 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*I(AER10-DGS3MO)
+               + DlogGDP + unempGap + DlogDef + DHI + VIX + DlogSPY + BBB10Spr | RSSD9001,
+               findfFinalBuckets, vcov = DK(4), split = ~assetSizeBuckets %keep% c("1", "3"), panel.id = c("RSSD9001", "RSSD9999"))
+
+noDeriv = feols(c(nniRateAnnSeasAdj) ~ l(nniRateAnnSeasAdj, 1) + DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2) + shortRateVol + macroFinUnc12 
+                + (DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2))*macroFinUnc12
+               + l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy) 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*DGS3MO 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*I(AER10-DGS3MO)
+               + DlogGDP + unempGap + DlogDef + DHI + VIX + DlogSPY + BBB10Spr | RSSD9001,
+               findfFinalBuckets, vcov = DK(4), split = ~noDerivFQ, panel.id = c("RSSD9001", "RSSD9999"))
+
+etable(fullSample, highMatGap, smallBank, noDeriv,
+       digits = 4, digits.stats = 4, 
+       title = tabTitle, label = tablabel, headers = headerLine,
+       group = controlGroups, dict = renameDict, depvar = F)
+
+tabTitle = "NNI and Macroeconomic Uncertainty Regressions for Financially Constrained Banks"
+tablabel = "tab::NNIMUSubsample"
+tabFile = "./Writing/tables/NNIMURegSubsample.txt"
+tabNotes = "Only selected variable coefficients are reported to conserve space.  Driscoll and Kraay standard errors are estimated and reported assuming residuals are autocorrelated up to the 4\\textsuperscript{th} lag."
+headerLine = c("Full Sample", "$P_{33}\\geq$ Maturity Gap", "$P_{66}\\leq$ Maturity Gap", "$P_{33}\\geq$ Total Assets", "$P_{66}\\leq$ Total Assets", "IR Derivatives used", "IR Derivatives unused")
+
+etable(fullSample, highMatGap, smallBank, noDeriv,
+       digits = 4, digits.stats = 4, 
+       title = tabTitle, label = tablabel, headers = headerLine, notes = tabNotes,
+       group = controlGroups, dict = renameDict, depvar = F,
+       style.tex = style.tex("aer"), tex = T, file = tabFile, replace = T, tpt = T)
+
+longRunEffect = coef(regMod1)[-1]/(1-coef(regMod1)[1])
+round(longRunEffect, 4)
+
+```
+
+## Loan Loss Provisions
+
+```{r Loan Provision Regressions}
+
+fullSample = feols(LoanProvisionSeasAdj ~ l(LoanProvisionSeasAdj, 4) + DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2) + shortRateVol + macroFinUnc12 
+                + (DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2))*macroFinUnc12
+               + l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy) 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*DGS3MO 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*I(AER10-DGS3MO)
+               + DlogGDP + unempGap + DlogDef + DHI + VIX + DlogSPY + BBB10Spr | RSSD9001,
+               findfFinalBuckets, vcov = DK(4), panel.id = c("RSSD9001", "RSSD9999"))
+
+highMatGap = feols(LoanProvisionSeasAdj ~ l(LoanProvisionSeasAdj, 4) + DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2) + shortRateVol + macroFinUnc12 
+                + (DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2))*macroFinUnc12
+               + l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy) 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*DGS3MO 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*I(AER10-DGS3MO)
+               + DlogGDP + unempGap + DlogDef + DHI + VIX + DlogSPY + BBB10Spr | RSSD9001,
+               findfFinalBuckets, vcov = DK(4), split = ~matGapBuckets %keep% c("1", "3"), panel.id = c("RSSD9001", "RSSD9999"))
+
+smallBank = feols(LoanProvisionSeasAdj ~ l(LoanProvisionSeasAdj, 4) + DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2) + shortRateVol + macroFinUnc12 
+                + (DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2))*macroFinUnc12
+               + l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy) 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*DGS3MO 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*I(AER10-DGS3MO)
+               + DlogGDP + unempGap + DlogDef + DHI + VIX + DlogSPY + BBB10Spr | RSSD9001,
+               findfFinalBuckets, vcov = DK(4), split = ~assetSizeBuckets %keep% c("1", "3"), panel.id = c("RSSD9001", "RSSD9999"))
+
+noDeriv = feols(LoanProvisionSeasAdj ~ l(LoanProvisionSeasAdj, 4) + DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2) + shortRateVol + macroFinUnc12 
+                + (DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2))*macroFinUnc12
+               + l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy) 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*DGS3MO 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*I(AER10-DGS3MO)
+               + DlogGDP + unempGap + DlogDef + DHI + VIX + DlogSPY + BBB10Spr | RSSD9001,
+               findfFinalBuckets, vcov = DK(4), split = ~noDerivFQ, panel.id = c("RSSD9001", "RSSD9999"))
+
+etable(fullSample, highMatGap, smallBank, noDeriv,
+       digits = 4, digits.stats = 4, 
+       title = tabTitle, label = tablabel, headers = headerLine,
+       group = controlGroups, dict = renameDict, depvar = F)
+
+tabTitle = "NIM and Macroeconomic Uncertainty Regressions for Financially Constrained Banks"
+tablabel = "tab::bankProfitMUSubsample"
+tabFile = "./Writing/tables/bankProfitsMURegSubsample.txt"
+tabNotes = "Only selected variable coefficients are reported to conserve space.  Driscoll and Kraay standard errors are estimated and reported assuming residuals are autocorrelated up to the 4\\textsuperscript{th} lag."
+headerLine = c("Full Sample", "$\\leq P_{10}$ Maturity Gap", "$\\geq P_{90}$ Maturity Gap", "$\\leq P_{10}$ Total Assets", "$\\geq P_{90}$ Total Assets", "IR Derivatives used", "IR Derivatives unused")
+
+etable(fullSample, highMatGap, smallBank, noDeriv,
+       digits = 4, digits.stats = 4, 
+       title = tabTitle, label = tablabel, headers = headerLine, notes = tabNotes,
+       group = controlGroups, dict = renameDict, depvar = F,
+       style.tex = style.tex("aer"), tex = T, file = tabFile, replace = T, tpt = T)
+
+longRunEffect = coef(regMod1)[-1]/(1-coef(regMod1)[1])
+round(longRunEffect, 4)
+
+```
+
+## Deposits
+
+```{r Deposits}
+
+fullSample = feols(intExpDepSeasAdj ~ l(intExpDepSeasAdj, 1) + DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2) + shortRateVol + macroFinUnc12 
+                + (DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2))*macroFinUnc12
+               + l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy) 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*DGS3MO 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*I(AER10-DGS3MO)
+               + DlogGDP + unempGap + DlogDef + DHI + VIX + DlogSPY + BBB10Spr | RSSD9001,
+               findfFinalBuckets, vcov = DK(4), panel.id = c("RSSD9001", "RSSD9999"))
+
+highMatGap = feols(intExpDepSeasAdj ~ l(intExpDepSeasAdj, 1) + DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2) + shortRateVol + macroFinUnc12 
+                + (DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2))*macroFinUnc12
+               + l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy) 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*DGS3MO 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*I(AER10-DGS3MO)
+               + DlogGDP + unempGap + DlogDef + DHI + VIX + DlogSPY + BBB10Spr | RSSD9001,
+               findfFinalBuckets, vcov = DK(4), split = ~matGapBuckets %keep% c("1", "3"), panel.id = c("RSSD9001", "RSSD9999"))
+
+smallBank = feols(intExpDepSeasAdj ~ l(intExpDepSeasAdj, 1) + DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2) + shortRateVol + macroFinUnc12 
+                + (DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2))*macroFinUnc12
+               + l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy) 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*DGS3MO 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*I(AER10-DGS3MO)
+               + DlogGDP + unempGap + DlogDef + DHI + VIX + DlogSPY + BBB10Spr | RSSD9001,
+               findfFinalBuckets, vcov = DK(4), split = ~assetSizeBuckets %keep% c("1", "3"), panel.id = c("RSSD9001", "RSSD9999"))
+
+noDeriv = feols(intExpDepSeasAdj ~ l(intExpDepSeasAdj, 1) + DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2) + shortRateVol + macroFinUnc12 
+                + (DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2))*macroFinUnc12
+               + l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy) 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*DGS3MO 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*I(AER10-DGS3MO)
+               + DlogGDP + unempGap + DlogDef + DHI + VIX + DlogSPY + BBB10Spr | RSSD9001,
+               findfFinalBuckets, vcov = DK(4), split = ~noDerivFQ, panel.id = c("RSSD9001", "RSSD9999"))
+
+etable(fullSample, highMatGap, smallBank, noDeriv,
+       digits = 4, digits.stats = 4, 
+       title = tabTitle, label = tablabel, headers = headerLine,
+       group = controlGroups, dict = renameDict, depvar = F)
+
+tabTitle = "NIM and Macroeconomic Uncertainty Regressions for Financially Constrained Banks"
+tablabel = "tab::bankProfitMUSubsample"
+tabFile = "./Writing/tables/bankProfitsMURegSubsample.txt"
+tabNotes = "Only selected variable coefficients are reported to conserve space.  Driscoll and Kraay standard errors are estimated and reported assuming residuals are autocorrelated up to the 4\\textsuperscript{th} lag."
+headerLine = c("Full Sample", "$\\leq P_{10}$ Maturity Gap", "$\\geq P_{90}$ Maturity Gap", "$\\leq P_{10}$ Total Assets", "$\\geq P_{90}$ Total Assets", "IR Derivatives used", "IR Derivatives unused")
+
+etable(fullSample, highMatGap, smallBank, noDeriv,
+       digits = 4, digits.stats = 4, 
+       title = tabTitle, label = tablabel, headers = headerLine, notes = tabNotes,
+       group = controlGroups, dict = renameDict, depvar = F,
+       style.tex = style.tex("aer"), tex = T, file = tabFile, replace = T, tpt = T)
+
+longRunEffect = coef(regMod1)[-1]/(1-coef(regMod1)[1])
+round(longRunEffect, 4)
+```
+
+## Mat Gap
+
+```{r Mat Gap}
+fullSample = feols(matGap ~ l(matGap, 1) + DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2) + shortRateVol + macroFinUnc12 
+                + (DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2))*macroFinUnc12
+               + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(log(totAssets)) + l(MADummy) 
+               + (l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(log(totAssets)) + l(MADummy))*DGS3MO 
+               + (l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(log(totAssets)) + l(MADummy))*I(AER10-DGS3MO)
+               + DlogGDP + unempGap + DlogDef + DHI + VIX + DlogSPY + BBB10Spr | RSSD9001,
+               findfFinalBuckets, vcov = DK(4), panel.id = c("RSSD9001", "RSSD9999"))
+
+smallBank = feols(matGap ~ l(matGap, 1) + DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2) + shortRateVol + macroFinUnc12 
+                + (DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2))*macroFinUnc12
+               + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(log(totAssets)) + l(MADummy) 
+               + (l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(log(totAssets)) + l(MADummy))*DGS3MO 
+               + (l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(log(totAssets)) + l(MADummy))*I(AER10-DGS3MO)
+               + DlogGDP + unempGap + DlogDef + DHI + VIX + DlogSPY + BBB10Spr | RSSD9001,
+               findfFinalBuckets, vcov = DK(4), split = ~assetSizeBuckets %keep% c("1", "3"), panel.id = c("RSSD9001", "RSSD9999"))
+
+noDeriv = feols(matGap ~ l(matGap, 1) + DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2) + shortRateVol + macroFinUnc12 
+                + (DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2))*macroFinUnc12
+               + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(log(totAssets)) + l(MADummy) 
+               + (l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(log(totAssets)) + l(MADummy))*DGS3MO 
+               + (l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(log(totAssets)) + l(MADummy))*I(AER10-DGS3MO)
+               + DlogGDP + unempGap + DlogDef + DHI + VIX + DlogSPY + BBB10Spr | RSSD9001,
+               findfFinalBuckets, vcov = DK(4), split = ~noDerivFQ, panel.id = c("RSSD9001", "RSSD9999"))
+
+etable(fullSample, smallBank, noDeriv,
+       digits = 4, digits.stats = 4, 
+       title = tabTitle, label = tablabel, headers = headerLine,
+       group = controlGroups, dict = renameDict, depvar = F)
+
+tabTitle = "NIM and Macroeconomic Uncertainty Regressions for Financially Constrained Banks"
+tablabel = "tab::bankProfitMUSubsample"
+tabFile = "./Writing/tables/bankProfitsMURegSubsample.txt"
+tabNotes = "Only selected variable coefficients are reported to conserve space.  Driscoll and Kraay standard errors are estimated and reported assuming residuals are autocorrelated up to the 4\\textsuperscript{th} lag."
+headerLine = c("Full Sample", "$\\leq P_{10}$ Total Assets", "$\\geq P_{90}$ Total Assets", "IR Derivatives used", "IR Derivatives unused")
+
+etable(fullSample, highMatGap, smallBank, noDeriv,
+       digits = 4, digits.stats = 4, 
+       title = tabTitle, label = tablabel, headers = headerLine, notes = tabNotes,
+       group = controlGroups, dict = renameDict, depvar = F,
+       style.tex = style.tex("aer"), tex = T, file = tabFile, replace = T, tpt = T)
+
+longRunEffect = coef(regMod1)[-1]/(1-coef(regMod1)[1])
+round(longRunEffect, 4)
+```
+
+## Loan Income
+
+```{r Loan Income}
+fullSample = feols(intIncLoansSeasAdj ~ l(intIncLoansSeasAdj, 1) + DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2) + shortRateVol + macroFinUnc12 
+                + (DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2))*macroFinUnc12
+               + l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy) 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*DGS3MO 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*I(AER10-DGS3MO)
+               + DlogGDP + unempGap + DlogDef + DHI + VIX + DlogSPY + BBB10Spr | RSSD9001,
+               findfFinalBuckets, vcov = DK(4), panel.id = c("RSSD9001", "RSSD9999"))
+
+highMatGap = feols(intIncLoansSeasAdj ~ l(intIncLoansSeasAdj, 1) + DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2) + shortRateVol + macroFinUnc12 
+                + (DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2))*macroFinUnc12
+               + l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy) 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*DGS3MO 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*I(AER10-DGS3MO)
+               + DlogGDP + unempGap + DlogDef + DHI + VIX + DlogSPY + BBB10Spr | RSSD9001,
+               findfFinalBuckets, vcov = DK(4), split = ~matGapBuckets %keep% c("1", "3"), panel.id = c("RSSD9001", "RSSD9999"))
+
+smallBank = feols(intIncLoansSeasAdj ~ l(intIncLoansSeasAdj, 1) + DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2) + shortRateVol + macroFinUnc12 
+                + (DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2))*macroFinUnc12
+               + l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy) 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*DGS3MO 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*I(AER10-DGS3MO)
+               + DlogGDP + unempGap + DlogDef + DHI + VIX + DlogSPY + BBB10Spr | RSSD9001,
+               findfFinalBuckets, vcov = DK(4), split = ~assetSizeBuckets %keep% c("1", "3"), panel.id = c("RSSD9001", "RSSD9999"))
+
+noDeriv = feols(intIncLoansSeasAdj ~ l(intIncLoansSeasAdj, 1) + DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2) + shortRateVol + macroFinUnc12 
+                + (DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2))*macroFinUnc12
+               + l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy) 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*DGS3MO 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*I(AER10-DGS3MO)
+               + DlogGDP + unempGap + DlogDef + DHI + VIX + DlogSPY + BBB10Spr | RSSD9001,
+               findfFinalBuckets, vcov = DK(4), split = ~noDerivFQ, panel.id = c("RSSD9001", "RSSD9999"))
+
+etable(fullSample, highMatGap, smallBank, noDeriv)
+
+headerLine = c("Full Sample", "Maturity Gap $\\leq P_{10}$", "Maturity Gap $\\geq P_{90}$", "Total Assets $\\leq P_{10}$", "Total Assets $\\geq P_{90}$", "IR Derivatives used", "IR Derivatives unused")
+
+# etable(fullSample, highMatGap, smallBank, noDeriv, digits = 4, digits.stats = 4, tex = T, drop = c("^l"), title = "Loan Interest Income Level Regressions for Financially Constrained Banks", notes = c(), group = controlGroups, adjustbox = TRUE, style.tex = style.tex("aer"), dict = renameDict, placement = "ht", headers = headerLine)
+
+```
+
+## Loan Share
+
+```{r Loan Share}
+fullSample = feols(loanShare ~ l(loanShare, 1) + DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2) + shortRateVol + macroFinUnc12
+                + (DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2))*macroFinUnc12
+               + l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(log(totAssets)) + l(MADummy) 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(log(totAssets)) + l(MADummy))*DGS3MO 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(log(totAssets)) + l(MADummy))*I(AER10-DGS3MO)
+               + DlogGDP + unempGap + DlogDef + DHI + VIX + DlogSPY + BBB10Spr | RSSD9001,
+               findfFinalBuckets, vcov = DK(4), panel.id = c("RSSD9001", "RSSD9999"))
+
+highMatGap = feols(loanShare ~ l(loanShare, 1) + DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2) + shortRateVol + macroFinUnc12 
+                + (DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2))*macroFinUnc12
+               + l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(log(totAssets)) + l(MADummy) 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(log(totAssets)) + l(MADummy))*DGS3MO 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(log(totAssets)) + l(MADummy))*I(AER10-DGS3MO)
+               + DlogGDP + unempGap + DlogDef + DHI + VIX + DlogSPY + BBB10Spr | RSSD9001,
+               findfFinalBuckets, vcov = DK(4), split = ~matGapBuckets %keep% c("1", "3"), panel.id = c("RSSD9001", "RSSD9999"))
+
+smallBank = feols(loanShare ~ l(loanShare, 1) + DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2) + shortRateVol + macroFinUnc12 
+                + (DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2))*macroFinUnc12
+               + l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(log(totAssets)) + l(MADummy) 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(log(totAssets)) + l(MADummy))*DGS3MO 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(log(totAssets)) + l(MADummy))*I(AER10-DGS3MO)
+               + DlogGDP + unempGap + DlogDef + DHI + VIX + DlogSPY + BBB10Spr | RSSD9001,
+               findfFinalBuckets, vcov = DK(4), split = ~assetSizeBuckets %keep% c("1", "3"), panel.id = c("RSSD9001", "RSSD9999"))
+
+noDeriv = feols(loanShare ~ l(loanShare, 1) + DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2) + shortRateVol + macroFinUnc12 
+                + (DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2))*macroFinUnc12
+               + l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(log(totAssets)) + l(MADummy) 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(log(totAssets)) + l(MADummy))*DGS3MO 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(log(totAssets)) + l(MADummy))*I(AER10-DGS3MO)
+               + DlogGDP + unempGap + DlogDef + DHI + VIX + DlogSPY + BBB10Spr | RSSD9001,
+               findfFinalBuckets, vcov = DK(4), split = ~noDerivFQ, panel.id = c("RSSD9001", "RSSD9999"))
+
+etable(fullSample, highMatGap, smallBank, noDeriv,
+       digits = 4, digits.stats = 4, 
+       title = tabTitle, label = tablabel, headers = headerLine,
+       group = controlGroups, dict = renameDict, depvar = F)
+
+tabTitle = "NIM and Macroeconomic Uncertainty Regressions for Financially Constrained Banks"
+tablabel = "tab::bankProfitMUSubsample"
+tabFile = "./Writing/tables/bankProfitsMURegSubsample.txt"
+tabNotes = "Only selected variable coefficients are reported to conserve space.  Driscoll and Kraay standard errors are estimated and reported assuming residuals are autocorrelated up to the 4\\textsuperscript{th} lag."
+headerLine = c("Full Sample", "$\\leq P_{10}$ Maturity Gap", "$\\geq P_{90}$ Maturity Gap", "$\\leq P_{10}$ Total Assets", "$\\geq P_{90}$ Total Assets", "IR Derivatives used", "IR Derivatives unused")
+
+etable(fullSample, highMatGap, smallBank, noDeriv,
+       digits = 4, digits.stats = 4, 
+       title = tabTitle, label = tablabel, headers = headerLine, notes = tabNotes,
+       group = controlGroups, dict = renameDict, depvar = F,
+       style.tex = style.tex("aer"), tex = T, file = tabFile, replace = T, tpt = T)
+
+longRunEffect = coef(regMod1)[-1]/(1-coef(regMod1)[1])
+round(longRunEffect, 4)
+```
+
+## Deposit Share
+
+```{r Deposit Share}
+fullSample = feols(I(demandDepShare + savingDepShare) ~ l(I(demandDepShare + savingDepShare), 1) + DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2) + shortRateVol + macroFinUnc12 
+                + (DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2))*macroFinUnc12
+               + l(matGap) + l(othAssetShare) + l(othLiabShare) + l(loanShare) + l(log(totAssets)) + l(MADummy) 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*DGS3MO 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*I(AER10-DGS3MO)
+               + DlogGDP + unempGap + DlogDef + DHI + VIX + DlogSPY + BBB10Spr | RSSD9001,
+               findfFinalBuckets, vcov = DK(4), panel.id = c("RSSD9001", "RSSD9999"))
+
+highMatGap = feols(I(demandDepShare + savingDepShare) ~ l(I(demandDepShare + savingDepShare), 1) + DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2) + shortRateVol + macroFinUnc12 
+                + (DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2))*macroFinUnc12
+               + l(matGap) + l(othAssetShare) + l(othLiabShare) + l(loanShare) + l(log(totAssets)) + l(MADummy) 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*DGS3MO 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*I(AER10-DGS3MO)
+               + DlogGDP + unempGap + DlogDef + DHI + VIX + DlogSPY + BBB10Spr | RSSD9001,
+               findfFinalBuckets, vcov = DK(4), split = ~matGapBuckets %keep% c("1", "3"), panel.id = c("RSSD9001", "RSSD9999"))
+
+smallBank = feols(I(demandDepShare + savingDepShare) ~ l(I(demandDepShare + savingDepShare), 1) + DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2) + shortRateVol + macroFinUnc12 
+                + (DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2))*macroFinUnc12
+               + l(matGap) + l(othAssetShare) + l(othLiabShare) + l(loanShare) + l(log(totAssets)) + l(MADummy) 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*DGS3MO 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*I(AER10-DGS3MO)
+               + DlogGDP + unempGap + DlogDef + DHI + VIX + DlogSPY + BBB10Spr | RSSD9001,
+               findfFinalBuckets, vcov = DK(4), split = ~assetSizeBuckets %keep% c("1", "3"), panel.id = c("RSSD9001", "RSSD9999"))
+
+noDeriv = feols(I(demandDepShare + savingDepShare) ~ l(I(demandDepShare + savingDepShare), 1) + DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2) + shortRateVol + macroFinUnc12 
+                + (DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2))*macroFinUnc12
+               + l(matGap) + l(othAssetShare) + l(othLiabShare) + l(loanShare) + l(log(totAssets)) + l(MADummy) 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*DGS3MO 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*I(AER10-DGS3MO)
+               + DlogGDP + unempGap + DlogDef + DHI + VIX + DlogSPY + BBB10Spr | RSSD9001,
+               findfFinalBuckets, vcov = DK(4), split = ~noDerivFQ, panel.id = c("RSSD9001", "RSSD9999"))
+
+etable(fullSample, highMatGap, smallBank, noDeriv,
+       digits = 4, digits.stats = 4, 
+       title = tabTitle, label = tablabel, headers = headerLine,
+       group = controlGroups, dict = renameDict, depvar = F)
+
+tabTitle = "NIM and Macroeconomic Uncertainty Regressions for Financially Constrained Banks"
+tablabel = "tab::bankProfitMUSubsample"
+tabFile = "./Writing/tables/bankProfitsMURegSubsample.txt"
+tabNotes = "Only selected variable coefficients are reported to conserve space.  Driscoll and Kraay standard errors are estimated and reported assuming residuals are autocorrelated up to the 4\\textsuperscript{th} lag."
+headerLine = c("Full Sample", "$\\leq P_{10}$ Maturity Gap", "$\\geq P_{90}$ Maturity Gap", "$\\leq P_{10}$ Total Assets", "$\\geq P_{90}$ Total Assets", "IR Derivatives used", "IR Derivatives unused")
+
+etable(fullSample, highMatGap, smallBank, noDeriv,
+       digits = 4, digits.stats = 4, 
+       title = tabTitle, label = tablabel, headers = headerLine, notes = tabNotes,
+       group = controlGroups, dict = renameDict, depvar = F,
+       style.tex = style.tex("aer"), tex = T, file = tabFile, replace = T, tpt = T)
+
+longRunEffect = coef(regMod1)[-1]/(1-coef(regMod1)[1])
+round(longRunEffect, 4)
+```
+
+# DiD Regressions
+
+```{r Create Maturity Gap subsamples and Descriptive Statistics}
+matGapBucketsdf = findfFinalBuckets %>%
+  as_tibble() %>%
+  select(-c(intIncSecSeasAdj)) %>%
+  drop_na(matGapBuckets) %>%
+  filter(matGapBuckets != 2) %>%
+  mutate(matGapBuckets = as.factor(matGapBuckets))
+
+bankVar = c("IEA", "totAssets", "totLiab", "totEquity", "assetMatPeriod", "liabMatPeriod", "matGap", "loanShare", "demandDepShare", "savingDepShare", "timeDepShare", "treasuryShare","othAssetShare", "othLiabShare", "niiRateAnnSeasAdj", "nniRateAnnSeasAdj", "roaAnnSeasAdj", "LoanProvisionSeasAdj", "deltaLogASeasAdj", "IRDerivOtherShare", "IRDerivTradeShare")
+
+descStats = matGapBucketsdf %>%
+  filter(matGapBuckets == 1) %>%
+  as_tibble() %>%
+  select(bankVar) %>%
+  mutate(across(ends_with("Share"), .fns = function(x){x*100})) %>%
+  mutate(across(ends_with("SeasAdj"), .fns = function(x){x*100})) %>%
+  apply(2, descriptiveStats) %>%
+  do.call(rbind, .)
+
+descStats
+
+descStats = data.frame(apply(descStats, 2, as.numeric), row.names = rownames(descStats))
+descStats[(endsWith(row.names(descStats), "Share") | endsWith(row.names(descStats), "SeasAdj")),1:9] =
+  descStats[(endsWith(row.names(descStats), "Share") | endsWith(row.names(descStats), "SeasAdj")),1:9] %>%
+  mutate(across(everything(), function(x){paste0(x, "%")}))
+
+rownames(descStats) = c("IEA", "Assets", "Liabilities", "Equity", "Asset Duration", "Liability Duration", "Maturity Gap", "Loan Share", "Demand Deposit Share", "Saving Deposit Share", "Time Deposit Share", "Treasury Share", "Other Asset Share", "Other Liability Share", "NIM", "NNI", "ROA", "Loan Provision", "Delta Ln (Assets)", "IR Hedging Derivatives", "IR Trading Derivatives")
+colnames(descStats) = c("Mean", "P0", "P25", "P50", "P75", "P100", "SD", "Skew", "Kurt", "N")
+descStats["N"] = apply(descStats["N"], 1, as.integer)
+
+# write.csv(descStats, "./Writing/tables/descStats.csv")
+# xtable::xtable(descStats)
+
+length(unique(findfFinal$RSSD9001))
+
+descStats = matGapBucketsdf %>%
+  filter(matGapBuckets == 3) %>%
+  as_tibble() %>%
+  select(bankVar) %>%
+  mutate(across(ends_with("Share"), .fns = function(x){x*100})) %>%
+  mutate(across(ends_with("SeasAdj"), .fns = function(x){x*100})) %>%
+  apply(2, descriptiveStats) %>%
+  do.call(rbind, .)
+
+descStats
+
+descStats = data.frame(apply(descStats, 2, as.numeric), row.names = rownames(descStats))
+descStats[(endsWith(row.names(descStats), "Share") | endsWith(row.names(descStats), "SeasAdj")),1:9] =
+  descStats[(endsWith(row.names(descStats), "Share") | endsWith(row.names(descStats), "SeasAdj")),1:9] %>%
+  mutate(across(everything(), function(x){paste0(x, "%")}))
+
+rownames(descStats) = c("IEA", "Assets", "Liabilities", "Equity", "Asset Duration", "Liability Duration", "Maturity Gap", "Loan Share", "Demand Deposit Share", "Saving Deposit Share", "Time Deposit Share", "Treasury Share", "Other Asset Share", "Other Liability Share", "NIM", "NNI", "ROA", "Loan Provision", "Delta Ln (Assets)", "IR Hedging Derivatives", "IR Trading Derivatives")
+colnames(descStats) = c("Mean", "P0", "P25", "P50", "P75", "P100", "SD", "Skew", "Kurt", "N")
+descStats["N"] = apply(descStats["N"], 1, as.integer)
+
+# write.csv(descStats, "./Writing/tables/descStats.csv")
+# xtable::xtable(descStats)
+
+matGapBucketsdf %>%
+  count(RSSD9999, matGapBuckets) %>%
+  group_by(matGapBuckets) %>%
+  summarize(mean_n = mean(n))
+
+matGapBucketsdf %>%
+  count(RSSD9001, matGapBuckets) %>%
+  group_by(matGapBuckets) %>%
+  summarize(mean_n = mean(n))
+```
+
+
+```{r Maturity Gap DiD}
+
+regMod11 = feols(nniRateAnnSeasAdj ~ matGapBuckets*(l(nniRateAnnSeasAdj, 1) + DGS3MO + I(AER10-DGS3MO) + TP10 
+                  + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2) + shortRateVol + macroFinUnc12 
+                + (DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2))*macroFinUnc12
+               + l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy) 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*DGS3MO 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*I(AER10-DGS3MO)
+               + DlogGDP + unempGap + DlogDef + DHI + VIX + DlogSPY + BBB10Spr) | RSSD9001, vcov = DK(4), data = matGapBucketsdf, panel.id = c("RSSD9001", "RSSD9999"))
+
+
+regMod12 = feols(nniRateAnnSeasAdj ~ l(nniRateAnnSeasAdj, 1) + DGS3MO + I(AER10-DGS3MO) + TP10 
+                  + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2) + shortRateVol + macroFinUnc12 
+                + (DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2))*macroFinUnc12
+               + l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy) 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*DGS3MO 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*I(AER10-DGS3MO)
+               + DlogGDP + unempGap + DlogDef + DHI + VIX + DlogSPY + BBB10Spr | RSSD9001, vcov = DK(4), data = matGapBucketsdf, panel.id = c("RSSD9001", "RSSD9999"))
+```
+
+```{r Size DiD}
+
+# Size
+assetSizeBucketsdf = findfFinalBuckets %>%
+  as_tibble() %>%
+  select(-c(intIncSecSeasAdj)) %>%
+  drop_na(assetSizeBuckets) %>%
+  group_by(RSSD9999, assetSizeBuckets) %>%
+  filter(assetSizeBuckets != 2) %>%
+  mutate(assetSizeBuckets = as.factor(assetSizeBuckets))
+
+regMod21 = feols(nniRateAnnSeasAdj ~ assetSizeBuckets*(l(nniRateAnnSeasAdj, 1) + DGS3MO + I(AER10-DGS3MO) + TP10 
+                  + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2) + shortRateVol + macroFinUnc12 
+                + (DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2))*macroFinUnc12
+               + l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy) 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*DGS3MO 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*I(AER10-DGS3MO)
+               + DlogGDP + unempGap + DlogDef + DHI + VIX + DlogSPY + BBB10Spr) | RSSD9001, vcov = DK(4), data = assetSizeBucketsdf, panel.id = c("RSSD9001", "RSSD9999"))
+
+
+regMod22 = feols(nniRateAnnSeasAdj ~ l(nniRateAnnSeasAdj, 1) + DGS3MO + I(AER10-DGS3MO) + TP10 
+                  + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2) + shortRateVol + macroFinUnc12 
+                + (DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2))*macroFinUnc12
+               + l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy) 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*DGS3MO 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*I(AER10-DGS3MO)
+               + DlogGDP + unempGap + DlogDef + DHI + VIX + DlogSPY + BBB10Spr | RSSD9001, vcov = DK(4), data = assetSizeBucketsdf, panel.id = c("RSSD9001", "RSSD9999"))
+```
+
+```{r Derivatives DiD}
+# Derivative Use
+derivUsedf = findfFinalBuckets %>%
+  as_tibble() %>%
+  select(-c(intIncSecSeasAdj)) %>%
+  drop_na(noDerivFQ) %>%
+  group_by(RSSD9999, noDerivFQ) %>%
+  mutate(noDerivFQ = as.factor(noDerivFQ))
+
+regMod31 = feols(nniRateAnnSeasAdj ~ noDerivFQ*(l(nniRateAnnSeasAdj, 1) + DGS3MO + I(AER10-DGS3MO) + TP10 
+                  + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2) + shortRateVol + macroFinUnc12 
+                + (DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2))*macroFinUnc12
+               + l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy) 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*DGS3MO 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*I(AER10-DGS3MO)
+               + DlogGDP + unempGap + DlogDef + DHI + VIX + DlogSPY + BBB10Spr) | RSSD9001, vcov = DK(4), data = derivUsedf, panel.id = c("RSSD9001", "RSSD9999"))
+
+
+regMod32 = feols(nniRateAnnSeasAdj ~ l(nniRateAnnSeasAdj, 1) + DGS3MO + I(AER10-DGS3MO) + TP10 
+                  + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2) + shortRateVol + macroFinUnc12 
+                + (DGS3MO + I(AER10-DGS3MO) + TP10 + I(DGS3MO^2) + I((AER10-DGS3MO)^2) + I(TP10^2))*macroFinUnc12
+               + l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy) 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*DGS3MO 
+               + (l(matGap) + l(othAssetShare) + l(othLiabShare) + l(demandDepShare) + l(savingDepShare) + l(loanShare) + l(log(totAssets)) + l(MADummy))*I(AER10-DGS3MO)
+               + DlogGDP + unempGap + DlogDef + DHI + VIX + DlogSPY + BBB10Spr | RSSD9001, vcov = DK(4), data = derivUsedf, panel.id = c("RSSD9001", "RSSD9999"))
+
+```
+
+```{r Rename and Control Dicts}
+renameDict = c(niiRateAnnSeasAdj = "NIM", `l(niiRateAnnSeasAdj,1)` = "L(NIM)", nniRateAnnSeasAdj = "NNI", 
+               `l(nniRateAnnSeasAdj,1)` = "L(NNI)", roaAnnSeasAdj = "ROA", `l(roaAnnSeasAdj,1)` = "L(Pi)",
+               `l(LoanProvisionSeasAdj,1)` = "L(LoanLossProvision)", `l(intIncLoansSeasAdj,1)` = "L(IntIncLoans)", `l(treasuryShare,1)` = "L(TreasuryShare)",
+               DGS3MO = "Y3MO", T10Y3M = "Y10-Y3MO",`I(AER10 - DGS3MO)` =  "EH10-Y3MO",`I(DGS3MO^2)` = "Y3MO squared", 
+               `I(T10Y3M^2)` = "(Y10-Y3MO) square",`I((AER10 - DGS3MO)^2)` =  "(EH10-Y3MO) square","I(TP10^2)" = "TP10 square", 
+               macroFinUnc12 = "MacroUncertain", `l(MADummy, 1)` = "L(Merge/Acq)", `l(matGap,1)` = "L(MatGap)", `l(othAssetShare,1)` = "L(OthAssetShare)", 
+               `l(othLiabShare,1)` = "L(OthLiabShare)", `l(demandDepShare,1)` = "L(DemandDepShare)", `l(savingDepShare,1)` = "L(SavingDepShare)", 
+               `l(loanShare,1)` = "L(LoanShare)", `l(log(totAssets),1)` = "L(ln(Assets))", RSSD9001 = "Bank", shortRateVol = "IRVol",
+               matGapBuckets3 = "g", assetSizeBuckets3 = "g", noDerivFQ1 = "g")
+
+macroCtrl = c("DlogGDP", "unempGap", "DlogDef", "DHI", "VIX", "DlogSPY", "BBB10Spr")
+bankCtrl = c("LoanShare", "MatGap", "OthAssetShare", "OthLiabShare", "DemandDepShare", "SavingDepShare", "Assets", "Merge/Acq")
+
+controlGroups = list("Macro Controls" = macroCtrl, "Bank Controls" = bankCtrl)
+
+tabTitle = "Uncertainty Effects on NNI of Financially Constrained Banks"
+tablabel = "tab::didRegNNI"
+tabFile = "./Writing/tables/didRegNNI.txt"
+tabNotes = "This table presents selected estimates of coefficients from Equation (), estimated with a full-dummy set (Slope and Intercept) for each exogenous variable. Driscoll and Kraay standard errors are estimated and reported assuming residuals are autocorrelated up to the 4\\textsuperscript{th} lag. First lag of the dependent variable - NNI - is included in each regression and reported. g denotes the 'alternative' group dummy and its definition varies for each column. For columns (1) and (2), g=1 indicates the group of banks each quarter with the highest maturity gap and asset size. For column (3), g=1 indicates the group of banks each quarter which do not use derivatives for trading or hedging. Hence, for each regression specification, a significant coefficient suggests that there is difference between sensitivities of the two groups to changes in the given exogenous variable."
+
+headerLine = c("NNI$\\times$MatGap", "NNI$\\times$AssetSize", "NNI$\\times$NoDerivative")
+```
+
+```{r Output DiD tables}
+etable(regMod11, regMod21, regMod31,
+       digits = 4, digits.stats = 4, headers = headerLine,
+       title = tabTitle, label = tablabel, keep = "^g\\sx.+",
+       group = controlGroups, dict = renameDict, depvar = F, drop = "Y3MO\\sx.+")
+
+etable(regMod11, regMod21, regMod31,
+       digits = 4, digits.stats = 4, keep = "^g\\s.+",
+       title = tabTitle, label = tablabel, headers = headerLine, notes = tabNotes,
+       group = controlGroups, dict = renameDict, depvar = F,
+       style.tex = style.tex("aer"), tex = T, file = tabFile, replace = T, tpt = T, drop = "Y3MO\\sx.+")
+```
+
