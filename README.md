@@ -2,7 +2,7 @@
   The repository contains the code I wrote for my Senior Thesis at Singapore Management University, "Banking on Banks: Impact of Interest Rates and Uncertainty on Bank Profits." Repository contains code files which:
  1. Extract publically available US Call reports data from the Chicago Fed's website inside the Data folder. Only publically available data and reasonably sized data (Full call report df was 80 GB) is uploaded.
  2. Clean and process the data into a useable format.
- 3. Analyses the data to produce the tables and figures I have (and will) include in the paper.
+ 3. Analyses the data to produce the tables and figures I include in the paper.
 
 		|Data - contains jupyter notebooks used to download and combine US Call Reports into a long panel
 		|__FedRates - interest-rate and term premia time series of various horizons retrieved from FRED
