@@ -1,0 +1,332 @@
+{
+  "pdf": "Writing/UncertaintyAndBankProfits.pdf",
+  "scope": "Table 1: all 210 displayed numeric cells. Tables 2-5 and 9-10: first coefficient row and its standard errors, observations, R-squared, and within R-squared. Passing is a partial numerical check, not full reproduction.",
+  "table_1": {
+    "pdf_page": 9,
+    "file": "descStats.csv",
+    "reference_file": "reproduction/reference/tables/descStats.csv"
+  },
+  "regression_tables": [
+    {
+      "table": 2,
+      "pdf_page": 21,
+      "file": "bankProfitsMUReg.txt",
+      "reference_file": null,
+      "rows": [
+        {
+          "label": "L(Pi)",
+          "values": [
+            "0.7266",
+            "0.5295",
+            "0.4387"
+          ],
+          "standard_errors": [
+            "0.0171",
+            "0.0163",
+            "0.0142"
+          ]
+        },
+        {
+          "label": "Observations",
+          "values": [
+            "420,772",
+            "420,772",
+            "420,772"
+          ]
+        },
+        {
+          "label": "R$^2$",
+          "values": [
+            "0.8805",
+            "0.7269",
+            "0.5383"
+          ]
+        },
+        {
+          "label": "Within R$^2$",
+          "values": [
+            "0.7553",
+            "0.4151",
+            "0.3003"
+          ]
+        }
+      ]
+    },
+    {
+      "table": 3,
+      "pdf_page": 22,
+      "file": "explanatoryReg.txt",
+      "reference_file": "reproduction/reference/tables/explanatoryReg.txt",
+      "rows": [
+        {
+          "label": "L(LoanShare)",
+          "values": [
+            "0.9343",
+            "1.71e-5",
+            "-0.1103",
+            "0.0008",
+            "-0.0104"
+          ],
+          "standard_errors": [
+            "0.0151",
+            "0.0006",
+            "0.2214",
+            "0.0005",
+            "0.0119"
+          ]
+        },
+        {
+          "label": "Observations",
+          "values": [
+            "420,772",
+            "262,367",
+            "420,772",
+            "419,732",
+            "420,772"
+          ]
+        },
+        {
+          "label": "R$^2$",
+          "values": [
+            "0.9604",
+            "0.4316",
+            "0.9682",
+            "0.9054",
+            "0.9708"
+          ]
+        },
+        {
+          "label": "Within R$^2$",
+          "values": [
+            "0.8823",
+            "0.2587",
+            "0.9124",
+            "0.8301",
+            "0.9154"
+          ]
+        }
+      ]
+    },
+    {
+      "table": 4,
+      "pdf_page": 23,
+      "file": "didRegNIM.txt",
+      "reference_file": null,
+      "rows": [
+        {
+          "label": "g $\\times$ L(NIM)",
+          "values": [
+            "0.0170",
+            "0.0683",
+            "0.0127"
+          ],
+          "standard_errors": [
+            "0.0083",
+            "0.0157",
+            "0.0110"
+          ]
+        },
+        {
+          "label": "Observations",
+          "values": [
+            "261,205",
+            "276,435",
+            "420,772"
+          ]
+        },
+        {
+          "label": "R$^2$",
+          "values": [
+            "0.8903",
+            "0.8807",
+            "0.8809"
+          ]
+        },
+        {
+          "label": "Within R$^2$",
+          "values": [
+            "0.7506",
+            "0.7400",
+            "0.7563"
+          ]
+        }
+      ]
+    },
+    {
+      "table": 5,
+      "pdf_page": 24,
+      "file": "didRegNNI.txt",
+      "reference_file": "reproduction/reference/tables/didRegNNI.txt",
+      "rows": [
+        {
+          "label": "g $\\times$ L(NNI)",
+          "values": [
+            "-0.0242",
+            "0.0014",
+            "0.0273"
+          ],
+          "standard_errors": [
+            "0.0117",
+            "0.0176",
+            "0.0128"
+          ]
+        },
+        {
+          "label": "Observations",
+          "values": [
+            "261,205",
+            "276,435",
+            "420,772"
+          ]
+        },
+        {
+          "label": "R$^2$",
+          "values": [
+            "0.7356",
+            "0.7391",
+            "0.7277"
+          ]
+        },
+        {
+          "label": "Within R$^2$",
+          "values": [
+            "0.3983",
+            "0.3917",
+            "0.4167"
+          ]
+        }
+      ]
+    },
+    {
+      "table": 9,
+      "pdf_page": 35,
+      "file": "bankProfitsMURegSubsample.txt",
+      "reference_file": null,
+      "rows": [
+        {
+          "label": "L(NIM)",
+          "values": [
+            "0.7266",
+            "0.7000",
+            "0.7120",
+            "0.6669",
+            "0.7339",
+            "0.6587",
+            "0.7210"
+          ],
+          "standard_errors": [
+            "0.0171",
+            "0.0186",
+            "0.0159",
+            "0.0222",
+            "0.0154",
+            "0.0334",
+            "0.0165"
+          ]
+        },
+        {
+          "label": "Observations",
+          "values": [
+            "420,772",
+            "139,919",
+            "140,332",
+            "140,014",
+            "140,311",
+            "66,798",
+            "353,974"
+          ]
+        },
+        {
+          "label": "R$^2$",
+          "values": [
+            "0.8805",
+            "0.8729",
+            "0.9056",
+            "0.8690",
+            "0.8929",
+            "0.8530",
+            "0.8839"
+          ]
+        },
+        {
+          "label": "Within R$^2$",
+          "values": [
+            "0.7553",
+            "0.7085",
+            "0.7584",
+            "0.7255",
+            "0.7450",
+            "0.6301",
+            "0.7528"
+          ]
+        }
+      ]
+    },
+    {
+      "table": 10,
+      "pdf_page": 36,
+      "file": "NNIMURegSubsample.txt",
+      "reference_file": "reproduction/reference/tables/NNIMURegSubsample.txt",
+      "rows": [
+        {
+          "label": "L(NNI)",
+          "values": [
+            "0.5295",
+            "0.5082",
+            "0.4671",
+            "0.4857",
+            "0.4963",
+            "0.4394",
+            "0.5224"
+          ],
+          "standard_errors": [
+            "0.0163",
+            "0.0173",
+            "0.0155",
+            "0.0130",
+            "0.0236",
+            "0.0261",
+            "0.0140"
+          ],
+          "reference_label": "L(Pi)"
+        },
+        {
+          "label": "Observations",
+          "values": [
+            "420,772",
+            "139,919",
+            "140,332",
+            "140,014",
+            "140,311",
+            "66,798",
+            "353,974"
+          ]
+        },
+        {
+          "label": "R$^2$",
+          "values": [
+            "0.7269",
+            "0.7289",
+            "0.7541",
+            "0.7193",
+            "0.7092",
+            "0.6655",
+            "0.7347"
+          ]
+        },
+        {
+          "label": "Within R$^2$",
+          "values": [
+            "0.4151",
+            "0.3620",
+            "0.3642",
+            "0.3545",
+            "0.3731",
+            "0.3289",
+            "0.4023"
+          ]
+        }
+      ]
+    }
+  ]
+}

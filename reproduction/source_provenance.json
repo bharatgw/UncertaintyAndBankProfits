@@ -1,0 +1,324 @@
+[
+  {
+    "path": "Data_1-CombineCallReports.r",
+    "role": "code",
+    "source": "4d4e250:Data_1-CombineCallReports.r",
+    "description": "Current build combines legacy reports through 2010 with FFIEC reports through 2023 Q2. The June preprocessing cutoff differs from the original source; see reproduction/RESULT_COMPARISON.md.",
+    "sha256": "811c6f3c97f2f3dd9320e195bd3825eee0c54c393d6d04b138bafe5bb5e47447"
+  },
+  {
+    "path": "Data_4-ContiguousTimeSeries.r",
+    "role": "code",
+    "source": "4d4e250:Data_4-ContiguousTimeSeries.r",
+    "description": "Select the longest contiguous series for each bank variable.",
+    "sha256": "d67b39d13371633a437bb49e7c85d8c7405f0c9d19393ac39a43327e3c4ba669"
+  },
+  {
+    "path": "Data_5-SeasonalAdjust.py",
+    "role": "code",
+    "source": "4d4e250:Data_5-SeasonalAdjust.py",
+    "description": "X13 adjustment with executable preflight, per-call temporary files, optional ordered bank concurrency, and bank/series failure reporting. Original adjusted-series and row-exclusion rules are preserved.",
+    "sha256": "697d0e58b616c34e1dcd00921b1200e9944bcada6472c43c2259d2e0dfd6e398"
+  },
+  {
+    "path": "customFunctions.r",
+    "role": "code",
+    "source": "4d4e250:customFunctions.r",
+    "description": "Bank filters, pooled percentile clipping, and contiguous-series routines.",
+    "sha256": "5a603c51a728ee68df115e3bded238b405a19384a57c90ea97a58a5e8ee39929"
+  },
+  {
+    "path": "LICENSE",
+    "role": "documentation",
+    "source": "4d4e250:LICENSE",
+    "description": "Project license.",
+    "sha256": "1af61216c2e168696d77de025452c71a5d0b6b00d3781493b166755321226a68"
+  },
+  {
+    "path": "Data/code_createCombinedDatasets.ipynb",
+    "role": "code",
+    "source": "4d4e250:Data/code_createCombinedDatasets.ipynb",
+    "description": "Field selection, annual concatenation, and MDRM variable dictionary.",
+    "sha256": "d3ef63fff93def9febe538107d5802fd39ab1a13977216a048f2aa3e99e924e9"
+  },
+  {
+    "path": "Data_2-MergerAdjust.ipynb",
+    "role": "code",
+    "source": "4d4e250:Data_2-MergerAdjust.ipynb",
+    "description": "Appendix A equal-acquirer split, with successor preparation restricted through December 1, 2023, cached graph traversal, and cycle detection. Supplied 2026 record vintage is documented in reproduction/data_provenance.json.",
+    "sha256": "7c5e1802f02b66a50a47aed25bd4c7d4bb428f9a4cdf6db97240e0cd690be44d"
+  },
+  {
+    "path": "Data_3-VariableCreation.ipynb",
+    "role": "code",
+    "source": "4d4e250:Data_3-VariableCreation.ipynb; treasury export: 38b8e3e:Data_3-VariableCreation.ipynb",
+    "description": "Construct bank variables and export the treasury-holdings input before selecting derived columns.",
+    "sha256": "23f4620da512c024d4ee3932a94f0ed570637848e5777bed19c911d239ddc816"
+  },
+  {
+    "path": "Data/code_downloadCallReports.ipynb",
+    "role": "code",
+    "source": "4d4e250:Data/code_downloadCallReports.ipynb",
+    "description": "Current conversion restricts FFIEC inputs through 2023 Q2. The original 2024 source includes all quarters of 2023; see reproduction/RESULT_COMPARISON.md for the adjustment-window test.",
+    "sha256": "44ab4827dedef48bf194eae3e7a3606a2bf84170509eb11ece7a144848095aaf"
+  },
+  {
+    "path": "Data/FedRates/DGS2.csv",
+    "role": "macro input",
+    "source": "4d4e250:Data/FedRates/DGS2.csv",
+    "description": "Input bytes match the cited April 2024 Git revision.",
+    "sha256": "109b24646396c6e4db9be2a98f993680bc46b97599c9d03486b8a7ac62c85dde"
+  },
+  {
+    "path": "Data/FedRates/DGS3MO.csv",
+    "role": "macro input",
+    "source": "4d4e250:Data/FedRates/DGS3MO.csv",
+    "description": "Input bytes match the cited April 2024 Git revision.",
+    "sha256": "e167c414f64798eb5f7b92b1b86b014ef64b388edbdd54d2d035a5e185a6fd44"
+  },
+  {
+    "path": "Data/FedRates/DGS5.csv",
+    "role": "macro input",
+    "source": "4d4e250:Data/FedRates/DGS5.csv",
+    "description": "Input bytes match the cited April 2024 Git revision.",
+    "sha256": "f944cd8bd114f7d5e5cfdb402937a3b8c15c8955e9ae878add866339521212c8"
+  },
+  {
+    "path": "Data/FedRates/DGS10.csv",
+    "role": "macro input",
+    "source": "4d4e250:Data/FedRates/DGS10.csv",
+    "description": "Input bytes match the cited April 2024 Git revision.",
+    "sha256": "d72ca43d09ce7ab773516fb3a3b8114b97098ec1d52a8b9bb4703133a4b23c03"
+  },
+  {
+    "path": "Data/FedRates/T10Y3M.csv",
+    "role": "macro input",
+    "source": "4d4e250:Data/FedRates/T10Y3M.csv",
+    "description": "Input bytes match the cited April 2024 Git revision.",
+    "sha256": "019a403e0a704171cd8d4c00a5d20dcda399d3e697f88cda73a8935817b5a838"
+  },
+  {
+    "path": "Data/FedRates/KimWrightTP.csv",
+    "role": "macro input",
+    "source": "4d4e250:Data/FedRates/KimWrightTP.csv",
+    "description": "Input bytes match the cited April 2024 Git revision.",
+    "sha256": "a7cf8f6b7ccb7516ce962bed91ecc108c60194583c4c3c84cbac2da728d4774f"
+  },
+  {
+    "path": "Data/MacroControls/GDPC1.csv",
+    "role": "macro input",
+    "source": "4d4e250:Data/MacroControls/GDPC1.csv",
+    "description": "Input bytes match the cited April 2024 Git revision.",
+    "sha256": "c21b3582c0c9543c92d50f7167709ed92248ce1c8cd494b115a51da3c2d07afa"
+  },
+  {
+    "path": "Data/MacroControls/GDPDEF.csv",
+    "role": "macro input",
+    "source": "4d4e250:Data/MacroControls/GDPDEF.csv",
+    "description": "Input bytes match the cited April 2024 Git revision.",
+    "sha256": "061c9d60500ed936ae2b54d8b0aef423d4e63eb5a90fdd87e82e4d777664aa0c"
+  },
+  {
+    "path": "Data/MacroControls/HousePriceIndex.csv",
+    "role": "macro input",
+    "source": "4d4e250:Data/MacroControls/HousePriceIndex.csv",
+    "description": "Input bytes match the cited April 2024 Git revision.",
+    "sha256": "7b24735ad5e02acdace2bd3e41123fda1748cc7fb9c9fe70a7524a65dc40c692"
+  },
+  {
+    "path": "Data/MacroControls/NROU.csv",
+    "role": "macro input",
+    "source": "4d4e250:Data/MacroControls/NROU.csv",
+    "description": "Input bytes match the cited April 2024 Git revision.",
+    "sha256": "e190b01cf9a624df5b9ab91550162b18f2fff3c2a52f2a6b7c5116c6f9de85da"
+  },
+  {
+    "path": "Data/MacroControls/T10BBBSPREAD.csv",
+    "role": "macro input",
+    "source": "4d4e250:Data/MacroControls/T10BBBSPREAD.csv",
+    "description": "Input bytes match the cited April 2024 Git revision.",
+    "sha256": "50fca474921e006928943702e93ac0b80238e45a5a4ae040ed1d9ec7937e6ef5"
+  },
+  {
+    "path": "Data/MacroControls/UNRATE.csv",
+    "role": "macro input",
+    "source": "4d4e250:Data/MacroControls/UNRATE.csv",
+    "description": "Input bytes match the cited April 2024 Git revision.",
+    "sha256": "35119d2e53ea0bfcac21e6b780719785883500007b7cb3eb751eaa02b2745b29"
+  },
+  {
+    "path": "Data/MacroFinanceUncertainty_202308Update/MacroUncertaintyToCirculate.xlsx",
+    "role": "macro input",
+    "source": "4d4e250:Data/MacroFinanceUncertainty_202308Update/MacroUncertaintyToCirculate.xlsx",
+    "description": "Input bytes match the cited April 2024 Git revision.",
+    "sha256": "9a6c4b774b8e92a34cb7c40dd671fa96dfb83754d43800b46aaff70aa318330f"
+  },
+  {
+    "path": "Data/MacroControls/spyVix.csv",
+    "role": "macro input",
+    "source": "Supplied CSV; collection date unverified",
+    "description": "S&P 500 and VIX input; 2024 vintage unverified.",
+    "sha256": "ad4420f4cc5e67b693b7effeb0801f85490c80c565100e7fd561f45122cd350a"
+  },
+  {
+    "path": "reproduce.Rmd",
+    "role": "code",
+    "source": "4d4e250:IR Regressions - Macroeconomic Uncertainty.rmd; PDF Equations (1)-(2)",
+    "description": "Tables 1-5 and 9-10, figure-panel export, and session information. Table 4 implements the NIM version of Equation (2); the cited R source specifies the NNI variant. Numerical reproduction is unverified.",
+    "sha256": "851e8f35d62355dbf7e8e68e72d7eb2a9ad88aa53e933c56e1fed06332277218"
+  },
+  {
+    "path": "reproduction/reproduction_chunks.json",
+    "role": "documentation",
+    "source": "reproduce.Rmd",
+    "description": "Result and purpose map for the named R analysis chunks.",
+    "sha256": "50e0cefa1f141c64caf72a83ae0a54c078b277215de6e36a369d3c56448a6561"
+  },
+  {
+    "path": "figures.ipynb",
+    "role": "code",
+    "source": "b530599:IR Regressions - Descriptive Plots.ipynb",
+    "description": "Figures 1-2 from quarterly means in the exported analysis panel. Source plotting code first appears in January 2025; numerical figure generation is unverified.",
+    "sha256": "4cfed6d2b9677d27ee842fcda50ca63a5a464daa84ecaeb8959a95bc73595cd0"
+  },
+  {
+    "path": "reproduction/reference/tables/descStats.csv",
+    "role": "reference table",
+    "source": "4d4e250:Writing/tables/descStats.csv",
+    "description": "Table 1; all 210 numeric cells agree with the PDF.",
+    "sha256": "0216a3e8fb266b1055cb7b055f7fcc72a9dcab05dcb7790edabd1e27da07cda4"
+  },
+  {
+    "path": "reproduction/reference/tables/explanatoryReg.txt",
+    "role": "reference table",
+    "source": "4d4e250:Writing/tables/explanatoryReg.txt",
+    "description": "Table 3; selected benchmark rows agree with the PDF.",
+    "sha256": "04d01738a1aa1d67ccce6d9c89bd361b16014f25da88babe6b2962b0f898140e"
+  },
+  {
+    "path": "reproduction/reference/tables/didRegNNI.txt",
+    "role": "reference table",
+    "source": "4d4e250:Writing/tables/didRegNNI.txt",
+    "description": "Table 5; selected benchmark rows agree with the PDF.",
+    "sha256": "efbdf365c662cc3b4078714b1bc1b3248784c037a9d19b62a73d57cfe66cf5f7"
+  },
+  {
+    "path": "reproduction/reference/tables/NNIMURegSubsample.txt",
+    "role": "reference table",
+    "source": "4d4e250:Writing/tables/NNIMURegSubsample.txt",
+    "description": "Table 10; selected benchmark rows agree with the PDF.",
+    "sha256": "1556cc6b739727d4b9e57abcc6285a0c9b6af0314a211988aa3ce48cbf1c0deb"
+  },
+  {
+    "path": "reproduction/reference/figures/uncertainPlots.png",
+    "role": "reference figure",
+    "source": "Figure 1 embedded in Writing/UncertaintyAndBankProfits.pdf",
+    "description": "RGB pixels match the corresponding embedded PDF image exactly.",
+    "sha256": "dc0e31a02514c51a4d2ac6eb2fcdc9b37e098b702d0916deb69013bc34dcc971"
+  },
+  {
+    "path": "reproduction/reference/figures/biVariatePlots.png",
+    "role": "reference figure",
+    "source": "Figure 2 embedded in Writing/UncertaintyAndBankProfits.pdf",
+    "description": "RGB pixels match the corresponding embedded PDF image exactly.",
+    "sha256": "4ca9b3d38ddbad2fcb8dd42c09299a50b345c4222cee448278972232604ad82a"
+  },
+  {
+    "path": "Writing/UncertaintyAndBankProfits.pdf",
+    "role": "paper",
+    "source": "April 2024 thesis",
+    "description": "Authoritative result and methodology target; 36 pages.",
+    "sha256": "13da511564e074ca6bf616cd41acba0862501e6b64e6cb7f35fa65f4c29e6375"
+  },
+  {
+    "path": "Data/notes-on-forming-consistent-time-series-pdf.pdf",
+    "role": "data documentation",
+    "source": "Supplied Call Report time-series documentation",
+    "description": "Supplementary guide to consistent reporting series.",
+    "sha256": "7e7cc2f751865b67fa3574498ca58597a2b52899840f41339e2db526d7b31ee5"
+  },
+  {
+    "path": "reproduction/reference/paper_targets.json",
+    "role": "validation benchmarks",
+    "source": "Writing/UncertaintyAndBankProfits.pdf, pages 9, 21-24, 35-36",
+    "description": "Displayed benchmark rows and their PDF locations; 140 regression entries plus the Table 1 reference.",
+    "sha256": "c95f0a8d48eff58d345a82151203769ce244a36fde75fd18a59d83419a588b6a"
+  },
+  {
+    "path": "reproduction/check_reproduction.py",
+    "role": "validation code",
+    "source": "Project validation script",
+    "description": "Checks SHA-256 integrity, Python syntax, input availability, and selected displayed PDF values.",
+    "sha256": "6944c630dbe4a3bb1b17f78ed8528b4e70a0f8a17034d7854947c1b73d781566"
+  },
+  {
+    "path": "README.md",
+    "role": "documentation",
+    "source": "Project execution guide",
+    "description": "Paper introduction, published key findings, software requirements, and data preparation and analysis commands.",
+    "sha256": "0c4f33b9014e423a8374ade4f1aa9e672145c943a57b4808da7235545738f84e"
+  },
+  {
+    "path": "reproduction/README.md",
+    "role": "documentation",
+    "source": "Project methodology and input guide",
+    "description": "Central guide to run status, result map, data preparation, provenance, software requirements, and verification scope.",
+    "sha256": "047fc2cce90e1f3da3c8d17684f0a83c34eff63a0bb023d00c0ecb56abe06412"
+  },
+  {
+    "path": ".gitignore",
+    "role": "configuration",
+    "source": "Project file exclusions",
+    "description": "Exclude local data, generated outputs, and runtime files.",
+    "sha256": "e3720ddb39c6dee25051fa6a851180c3712c11e572c1564bc4b4624e34f928fd"
+  },
+  {
+    "path": "reproduction/tests/test_reproduction.py",
+    "role": "validation tests",
+    "source": "Project benchmark-reader tests",
+    "description": "Check numeric parsing and reject wrong outcomes, changed estimates, duplicate rows, missing tables, and misaligned standard errors.",
+    "sha256": "7ee257808d15162ac18ffa611eabcc0e5475e37485f7c57de9fe78f27f69e2f9"
+  },
+  {
+    "path": "reproduction/tests/test_merger_preparation.py",
+    "role": "validation tests",
+    "source": "Data_2-MergerAdjust.ipynb",
+    "description": "Check successor chains, multiple acquirers, excluded transformation types, historical cutoff, and rejection of cycles.",
+    "sha256": "89d789e66d121ea973f98926e574c916b6396ab08ace2360de56917ee027f25e"
+  },
+  {
+    "path": "reproduction/data_provenance.json",
+    "role": "input provenance",
+    "source": "Supplied input inventory and validation",
+    "description": "File hashes, date coverage, and compatibility assessment for the supplied institution and processed-panel files.",
+    "sha256": "2c91214b332b64e21908a62c645b2ad58b26391db90e32a0863bbee56dfb16c6"
+  },
+  {
+    "path": "reproduction/VALIDATION.md",
+    "role": "validation report",
+    "source": "PDF benchmarks and supplied-file checks",
+    "description": "Input compatibility, candidate-panel comparisons, and raw-build validation status.",
+    "sha256": "2c8bf637d9b6e46c8a1a687fbf293dba0ce5248a3f2935336f06e2a238823174"
+  },
+  {
+    "path": "reproduction/tests/test_seasonal_reporting.py",
+    "role": "validation tests",
+    "source": "Data_5-SeasonalAdjust.py",
+    "description": "Tests adjustment success, failure and interrupt handling, temporary-file removal, and exact serial/concurrent bank output parity.",
+    "sha256": "22b0612b509e9a7dfbbb9a6d83eb201b51811515bf034084f4e2a00ef8b286fb"
+  },
+  {
+    "path": "reproduction/raw_input_manifest.json",
+    "role": "input provenance",
+    "source": "Call Report conversion and field selection inputs",
+    "description": "SHA-256 identities of the 126 raw files used by the acquisition/conversion and combined-data notebooks.",
+    "sha256": "5d3ae0a2039c80e7f28d9e8d50847abf42cfab5df4c4db62365a0896aa6a6136"
+  },
+  {
+    "path": "reproduction/RESULT_COMPARISON.md",
+    "role": "validation documentation",
+    "source": "PDF tables; outputs/sensitivity diagnostic regressions, effect calculations, and adjustment-window experiment",
+    "description": "Quantifies current-build differences and interpretation limits; identifies the premature raw-data cutoff and original-window rerun requirement.",
+    "sha256": "3c73d4bc62559435d9bfe1f3881f5d28827725fe58e92e80ce1efe66d7bdc87e"
+  }
+]
