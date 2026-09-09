@@ -1,0 +1,251 @@
+{
+  "scope": "Supplied institution files, candidate processed panel, and generated input records. Raw Call Report file identities are in raw_input_manifest.json; their vintage remains to be verified.",
+  "files": [
+    {
+      "path": "Data/MergerAdjust/CSV_ATTRIBUTES_CLOSED.csv",
+      "origin": "Supplied by the user",
+      "sha256": "b5af5c81823a42fd2531f484630de79bf6c15b87b556060e575932d38614caf0",
+      "rows": 162320,
+      "assessment": {
+        "rows": 162320,
+        "columns": [
+          "#ID_RSSD",
+          "BHC_IND",
+          "DT_START",
+          "DT_END",
+          "DT_OPEN"
+        ],
+        "sha256": "b5af5c81823a42fd2531f484630de79bf6c15b87b556060e575932d38614caf0",
+        "duplicate_ids": 0,
+        "latest_start": 20260721,
+        "after_paper_mapping": 587,
+        "bhc_counts": {
+          "0": 150853,
+          "1": 11445,
+          "2": 22
+        }
+      }
+    },
+    {
+      "path": "Data/MergerAdjust/CSV_ATTRIBUTES_BRANCHES.csv",
+      "origin": "Supplied by the user",
+      "sha256": "257df7a44000daa1608ce1a7816e57c19782adcd6994ad016d00266bc71bfb15",
+      "rows": 173827,
+      "assessment": {
+        "rows": 173827,
+        "columns": [
+          "#ID_RSSD",
+          "BHC_IND",
+          "DT_START",
+          "DT_END",
+          "DT_OPEN"
+        ],
+        "sha256": "257df7a44000daa1608ce1a7816e57c19782adcd6994ad016d00266bc71bfb15",
+        "duplicate_ids": 0,
+        "latest_start": 20260904,
+        "after_paper_mapping": 9900,
+        "bhc_counts": {
+          "0": 173827
+        }
+      }
+    },
+    {
+      "path": "Data/MergerAdjust/CSV_TRANSFORMATIONS.CSV",
+      "origin": "Supplied by the user",
+      "sha256": "5cc566b047a949fce42eca872e9c9d5884c26d9a9aa82d0091c09d0ff5d38fb6",
+      "rows": 59169,
+      "assessment": {
+        "rows": 59169,
+        "columns": [
+          "#ID_RSSD_PREDECESSOR",
+          "ID_RSSD_SUCCESSOR",
+          "TRNSFM_CD",
+          "DT_TRANS"
+        ],
+        "sha256": "5cc566b047a949fce42eca872e9c9d5884c26d9a9aa82d0091c09d0ff5d38fb6",
+        "date_min": 19360202,
+        "date_max": 20260904,
+        "after_paper_mapping": 1266,
+        "eligible_paper_records": 57787
+      }
+    },
+    {
+      "path": "Data/MergerAdjust/CSV_ATTRIBUTES_ACTIVE.csv",
+      "origin": "Supplied by the user",
+      "sha256": "6902c211450e393d0c7e022ed881a4bf76d0ee771f6a4e65febe34d3dfb32d77",
+      "rows": 61938,
+      "assessment": {
+        "rows": 61938,
+        "columns": [
+          "#ID_RSSD",
+          "BHC_IND",
+          "DT_START",
+          "DT_END",
+          "DT_OPEN"
+        ],
+        "sha256": "6902c211450e393d0c7e022ed881a4bf76d0ee771f6a4e65febe34d3dfb32d77",
+        "duplicate_ids": 0,
+        "latest_start": 20260904,
+        "after_paper_mapping": 9078,
+        "bhc_counts": {
+          "0": 58462,
+          "1": 3475,
+          "2": 1
+        }
+      }
+    },
+    {
+      "path": "Data/findf_RelSeries_CSA_MacroSeries.csv",
+      "origin": "Supplied by the user",
+      "sha256": "4af7392f78cea5eccaef6bc9da112b80d0b1bda81c8950113ed8e8c6e461ba8a",
+      "rows": 428689,
+      "assessment": {
+        "rows": 428689,
+        "banks": 4483,
+        "start": "1997Q2",
+        "end": "2023Q2",
+        "duplicate_keys": 0,
+        "missing_required_columns": [
+          "deltaLogASeasAdj",
+          "intIncSecSeasAdj"
+        ],
+        "sha256": "4af7392f78cea5eccaef6bc9da112b80d0b1bda81c8950113ed8e8c6e461ba8a",
+        "note": "Descriptive comparison treats deltaLogA as a diagnostic substitute only; it is not accepted as deltaLogASeasAdj.",
+        "status": "Does not match the PDF as supplied: different sample and estimates; asset-growth seasonal adjustment is absent.",
+        "table_2_observations": 421638,
+        "table_2_pdf_observations": 420772,
+        "macro_comparison": {
+          "variables": 13,
+          "quarters": 105,
+          "max_absolute_difference": 4.973799e-14,
+          "report": "outputs/input_validation/macro_comparison.csv"
+        }
+      }
+    },
+    {
+      "path": "Data/MergerAdjust/transformations.csv",
+      "origin": "Data_2-MergerAdjust.ipynb: merger preparation cell",
+      "sha256": "0c452abbe91c99bf596ff8545ffd2a18ea215c2ecd91764310798957967baeb6",
+      "rows": 60532,
+      "assessment": {
+        "mapping_cutoff": "2023-12-01",
+        "excluded_transformation_codes": [
+          5,
+          7
+        ],
+        "raw_vintage": "Source includes records through 2026-09-04. Date restriction does not reverse historical revisions."
+      }
+    },
+    {
+      "path": "Data/finalData/findf_RelSeries.csv",
+      "rows": 831720,
+      "origin": "Data_3-VariableCreation.ipynb",
+      "sha256": "c31a961d35d7cbae19557555aa735b257cd11ca413add497c74a1fd055d4fb1f",
+      "assessment": {
+        "unique_bank_quarter_keys": true,
+        "status": "Generated intermediate; final PDF sample checks pending."
+      }
+    },
+    {
+      "path": "Data/bankTreasuryHoldings.csv",
+      "rows": 831720,
+      "origin": "Data_3-VariableCreation.ipynb",
+      "sha256": "67402b404ede01f2c8332ecf701997501bb0ba3be3711e2aa3cce28ce457cd88",
+      "assessment": {
+        "unique_bank_quarter_keys": true,
+        "status": "Generated intermediate; final PDF sample checks pending."
+      }
+    },
+    {
+      "path": "Data/finalData/findf_RelSeriesContiguous.csv",
+      "origin": "Data_4-ContiguousTimeSeries.r",
+      "sha256": "9356f9a50a1899680c257ce95495d6b8b17f5f40c656399c88bfc9f03329c9ee",
+      "rows": 646013,
+      "assessment": {
+        "banks": 5046,
+        "unique_bank_quarter_keys": true,
+        "start": "1983 Q3",
+        "end": "2023 Q2",
+        "status": "Generated contiguous-series intermediate; final PDF sample checks pending."
+      }
+    },
+    {
+      "path": "Data/finalData/findf_RelSeriesContiguousSA.csv",
+      "origin": "Data_5-SeasonalAdjust.py; X13 1.1 Build 60; THESIS_X13_WORKERS=4",
+      "sha256": "84d51a22cc8597bb154ba20064180b01d5a21ac7f86eaca1a56dbe2bedf3cafe",
+      "rows": 636532,
+      "assessment": {
+        "banks": 4762,
+        "start": "1983-07-01",
+        "end": "2023-04-01",
+        "unique_bank_quarter_keys": true,
+        "main_adjusted_series_complete": true,
+        "failed_series": 41878,
+        "failures_by_series": {
+          "IntIncTrade": 5003,
+          "LoanProvision": 1981,
+          "deltaLogA": 151,
+          "intExpDep": 3241,
+          "intExpNotes": 4994,
+          "intExpTrade": 3796,
+          "intExpenseRateAnn": 239,
+          "intIncDepInst": 1967,
+          "intIncFed": 2092,
+          "intIncLoans": 267,
+          "intIncOthSec": 4354,
+          "intIncSec": 3811,
+          "intIncomeRateAnn": 166,
+          "niiRateAnn": 167,
+          "nniRateAnn": 168,
+          "othIntExp": 4990,
+          "othIntInc": 4310,
+          "roaAnn": 181
+        }
+      }
+    }
+  ],
+  "seasonal_adjustment_engine": {
+    "package": "x13as",
+    "version": "1.1 Build 60",
+    "url": "https://snapshot.debian.org/file/e448fd1aa241d4f8869b0294054c0fb492fe8d36",
+    "name": "x13as_1.1-b60.orig.tar.gz",
+    "sha1": "e448fd1aa241d4f8869b0294054c0fb492fe8d36",
+    "sha256": "2bd53953a1bdd238a128b89e95e8e5fc14f33aa4a9e4c7f0fc3fe7323b73131c",
+    "bytes": 1280624,
+    "binary_path": "x13as/x13as_ascii",
+    "binary_sha256": "d077e55473e484463f8acad49b22014790b061e4bc3f659d97640def9b59bdbe",
+    "build_flags": "-O2 -std=legacy -fallow-argument-mismatch; dynamic linking on macOS",
+    "version_evidence": "Build 60 identifier also present in 4d4e250:x13as/x13as_ascii.exe",
+    "smoke_test": "statsmodels quarterly test passed",
+    "concurrency_validation": "Serial and four-worker X13 outputs agree exactly, including missing values and failure identities, on a four-bank quarterly test."
+  },
+  "reproduction_validation": {
+    "status": "sample_mismatch",
+    "filtered_bank_quarters": 432159,
+    "filtered_banks": 4510,
+    "paper_bank_quarters": 427375,
+    "extra_bank_quarters": 4784,
+    "table_1_matching_cells": 76,
+    "table_1_compared_cells": 210,
+    "regressions_executed": false,
+    "figures_generated": false,
+    "report": "reproduction/VALIDATION.md"
+  },
+  "diagnostic_validation": {
+    "report": "reproduction/RESULT_COMPARISON.md",
+    "models": 28,
+    "sample_bank_quarters": 432159,
+    "main_regression_observations": 425487,
+    "reported_coefficient_cells_compared": 435,
+    "same_sign_cells": 433,
+    "same_5pct_decision_cells": 427,
+    "same_star_category_cells": 423,
+    "status": "Reported coefficients largely stable on current build; preprocessing window differs from original source; full original-window rerun outstanding",
+    "window_test": {
+      "banks_tested": 16,
+      "banks_with_all_six_fits_successful_through_2023Q4": 13,
+      "associated_supplied_rows": 1226,
+      "earlier_tested_series_values_exactly_unchanged": true
+    }
+  }
+}

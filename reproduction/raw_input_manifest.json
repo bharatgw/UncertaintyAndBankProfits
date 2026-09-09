@@ -1,0 +1,635 @@
+{
+  "scope": "Exact files used for Call Report conversion and field selection. File identity does not establish historical data vintage.",
+  "files": [
+    {
+      "path": "Data/ChicagoFedCallReportsLegacy/call1976.csv",
+      "bytes": 472553480,
+      "sha256": "d3762d6c2777f9c0bed00bda331f37300af638d2c185c34407fd9a5b4141e05a"
+    },
+    {
+      "path": "Data/ChicagoFedCallReportsLegacy/call1977.csv",
+      "bytes": 463577122,
+      "sha256": "6ee5b21c5f104503b1c289f4110b8345c63330b7b15e07b053c0001d5fda9517"
+    },
+    {
+      "path": "Data/ChicagoFedCallReportsLegacy/call1978.csv",
+      "bytes": 439938180,
+      "sha256": "5277c5152ad7b48a5aff86fcd2294a2bb0ea9009867973640a24e15de737712e"
+    },
+    {
+      "path": "Data/ChicagoFedCallReportsLegacy/call1979.csv",
+      "bytes": 372139298,
+      "sha256": "1f5a85449bfaa96e35bf200956eb9b38cecfc76b0654cdea06506c73112eea59"
+    },
+    {
+      "path": "Data/ChicagoFedCallReportsLegacy/call1980.csv",
+      "bytes": 374042183,
+      "sha256": "95f16345fac1ac6e136995adbda8840e8aaaaf881b053c35eae9b8a1b6bafa9d"
+    },
+    {
+      "path": "Data/ChicagoFedCallReportsLegacy/call1981.csv",
+      "bytes": 377998514,
+      "sha256": "befa1ebb56742e0f66c5c3ae12acd2b1735cb0ae215c8448dfe31cb0a67d076a"
+    },
+    {
+      "path": "Data/ChicagoFedCallReportsLegacy/call1982.csv",
+      "bytes": 377182516,
+      "sha256": "e1e51eddaf4187d903ef3823d14af3bb0ecbf5eaa2ca2d8d42ed035ca1edb9c6"
+    },
+    {
+      "path": "Data/ChicagoFedCallReportsLegacy/call1983.csv",
+      "bytes": 398697755,
+      "sha256": "6dae5574e596e415b7cc1e6b66865a8dd222f18cf1308d60eeb4571fd8f79502"
+    },
+    {
+      "path": "Data/ChicagoFedCallReportsLegacy/call1984.csv",
+      "bytes": 557990807,
+      "sha256": "9262c3236316ff114303c8dd5cef14feae6a65f35667cdfe8af5796ed12040ed"
+    },
+    {
+      "path": "Data/ChicagoFedCallReportsLegacy/call1985.csv",
+      "bytes": 562950841,
+      "sha256": "1ea1819c990debd9790d7e32133152c61ee8e795c018d28eab91ae78ac0f94fd"
+    },
+    {
+      "path": "Data/ChicagoFedCallReportsLegacy/call1986.csv",
+      "bytes": 568041947,
+      "sha256": "471dac862990c14260849e30eef1b64a55d45c5074ec9e82f3d735b1274f8394"
+    },
+    {
+      "path": "Data/ChicagoFedCallReportsLegacy/call1987.csv",
+      "bytes": 576393572,
+      "sha256": "c9c3236511b56def7b7243535c55bcfd108766c039d7916f4cbf737c98a8cfec"
+    },
+    {
+      "path": "Data/ChicagoFedCallReportsLegacy/call1988.csv",
+      "bytes": 592879253,
+      "sha256": "11ff2426d49d6efab34643590b10d0d04e4e183f279fecd409ae6a5534959933"
+    },
+    {
+      "path": "Data/ChicagoFedCallReportsLegacy/call1989.csv",
+      "bytes": 622293299,
+      "sha256": "e560b39ca16e936099b7e13d01c6355a37df273b87cd5fa7a36ee5fc7795f6d3"
+    },
+    {
+      "path": "Data/ChicagoFedCallReportsLegacy/call1990.csv",
+      "bytes": 668016841,
+      "sha256": "f8ef734a8d2a83f50b5ef4b4273d24bd2ded3fbfbf9dbc4140eb6e58eb83223f"
+    },
+    {
+      "path": "Data/ChicagoFedCallReportsLegacy/call1991.csv",
+      "bytes": 757683589,
+      "sha256": "25735492de087e62957d97c728714c3b93cf8c2757fb76cfc203e8dbacf4f1a9"
+    },
+    {
+      "path": "Data/ChicagoFedCallReportsLegacy/call1992.csv",
+      "bytes": 758240568,
+      "sha256": "503d76aac2f0900875b39ace17a4b53cad0ee2274f734154aa6f1edab7d95748"
+    },
+    {
+      "path": "Data/ChicagoFedCallReportsLegacy/call1993.csv",
+      "bytes": 761554655,
+      "sha256": "dcacc8cfe3b3ffd2215399c78c5060510bf01750e0445d47b58bc2b9992fba06"
+    },
+    {
+      "path": "Data/ChicagoFedCallReportsLegacy/call1994.csv",
+      "bytes": 815174109,
+      "sha256": "97874d52599f82cd675565f9ec5f79c4bcc0f27e4959f044403c2fac278c0e60"
+    },
+    {
+      "path": "Data/ChicagoFedCallReportsLegacy/call1995.csv",
+      "bytes": 891630028,
+      "sha256": "97af07d7d4c6dc0b90b403284d5224fa10a2b9499db30497c7ed2ba6ba40f71d"
+    },
+    {
+      "path": "Data/ChicagoFedCallReportsLegacy/call1996.csv",
+      "bytes": 867418041,
+      "sha256": "3bb4408e5575e300ba4be18117779a5d7355055f3eace255b0248c385a413723"
+    },
+    {
+      "path": "Data/ChicagoFedCallReportsLegacy/call1997.csv",
+      "bytes": 823339232,
+      "sha256": "d39c2db59ff4b1f9e101c5d38e593f0ebb44c235664578c41bcba04553eddce4"
+    },
+    {
+      "path": "Data/ChicagoFedCallReportsLegacy/call1998.csv",
+      "bytes": 761834651,
+      "sha256": "686cc6f7fbc09cbd9730798355defa329a208018ee23218d0d2996387d0de326"
+    },
+    {
+      "path": "Data/ChicagoFedCallReportsLegacy/call1999.csv",
+      "bytes": 737751595,
+      "sha256": "fb7d7ecfbd9b70464175a830da859fa1dcca615cd784caa784c36636ea320475"
+    },
+    {
+      "path": "Data/ChicagoFedCallReportsLegacy/call2000.csv",
+      "bytes": 723897846,
+      "sha256": "ddbac929dee0b6d9397a5e60067d0722da18526cf1fd3a218ca0d607b3fb4564"
+    },
+    {
+      "path": "Data/ChicagoFedCallReportsLegacy/call2001.csv",
+      "bytes": 1113122777,
+      "sha256": "c8ce056c0973aa7ef73d98fabe4de5c59bbba5d4891ce3becfc760f0feb6d091"
+    },
+    {
+      "path": "Data/ChicagoFedCallReportsLegacy/call2002.csv",
+      "bytes": 1181843336,
+      "sha256": "e924ff20fdc9d097795e5b8607edbbe626995f4d8f84aba8a420d177728d7756"
+    },
+    {
+      "path": "Data/ChicagoFedCallReportsLegacy/call2003.csv",
+      "bytes": 1204309942,
+      "sha256": "4766508f15a464a2c3a526026986fbf84a8d69c3248d98b2fba1c6c3099f3ea0"
+    },
+    {
+      "path": "Data/ChicagoFedCallReportsLegacy/call2004.csv",
+      "bytes": 1166768560,
+      "sha256": "5935e40cd473051f3ae5602199c13a1d2079a5473592b29fdb026ca78bcaf146"
+    },
+    {
+      "path": "Data/ChicagoFedCallReportsLegacy/call2005.csv",
+      "bytes": 1146620594,
+      "sha256": "44635866c207a47edd03fb83d90a9fcc56d396d61b7376eee14664afb2f8ee34"
+    },
+    {
+      "path": "Data/ChicagoFedCallReportsLegacy/call2006.csv",
+      "bytes": 1109081239,
+      "sha256": "16e31a7699a2f6f3d6f4c65916741a8543df9162c80503720547c90aedc1ee96"
+    },
+    {
+      "path": "Data/ChicagoFedCallReportsLegacy/call2007.csv",
+      "bytes": 1108715205,
+      "sha256": "43df36e28fcc4f68290e4a71987b24ca7a78567390442bd93692b69fccd68009"
+    },
+    {
+      "path": "Data/ChicagoFedCallReportsLegacy/call2008.csv",
+      "bytes": 1128404057,
+      "sha256": "5236ed193ac2b154d7cb8ffcdde578bbed6ba8bfb93b5dd627407b67cdf682c6"
+    },
+    {
+      "path": "Data/ChicagoFedCallReportsLegacy/call2009.csv",
+      "bytes": 1251393227,
+      "sha256": "a0e9bc453552d9d6b7a45a8e82a19a597ef6f872fa56bbbdcb9a70810ba3c561"
+    },
+    {
+      "path": "Data/ChicagoFedCallReportsLegacy/call2010.csv",
+      "bytes": 1257824024,
+      "sha256": "3d274c0685b7955bf484724719d0b3a657218a9e7eb02aabaa2ccf6632798a27"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 03312001.zip",
+      "bytes": 8210174,
+      "sha256": "02f744dfb634215d7b1fad99e5a332e62b59f051689442184ace9c811114e8fc"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 03312002.zip",
+      "bytes": 8244518,
+      "sha256": "b50c145728bacaee4e4f8761ab054ea26d6c2c4cdacb5f2135967db07e592d83"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 03312003.zip",
+      "bytes": 8185646,
+      "sha256": "7fb6f54930a1ad8b521ea0b7f4ddb81825ec4ef44042a52bfadfc2668f98f7cb"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 03312004.zip",
+      "bytes": 8052427,
+      "sha256": "bea1adc9131015c51e222ed753a42340e59b68399d1a87549eae4e95decb73bb"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 03312005.zip",
+      "bytes": 7968615,
+      "sha256": "ca539a99d71fb9a65c70e5907858d11028f0159de2f4f5d26d64f8c8dd3306ab"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 03312006.zip",
+      "bytes": 8044988,
+      "sha256": "5426fbba27db000c7e5a9af8c6c673eeb4c18557c34742c52130b41af5c6cc96"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 03312007.zip",
+      "bytes": 8210891,
+      "sha256": "258a9474d0e45ba0ef3f0237c9cb6e3e37b48c955d796a04520ceef34e78ef27"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 03312008.zip",
+      "bytes": 8107251,
+      "sha256": "b6ab096041937ef271f94dc211b68924f1036236f22b07dce353525dc7e3183b"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 03312009.zip",
+      "bytes": 8223296,
+      "sha256": "afc67290e7b8f7ee4dcbd02d7422822edaf4473f9bd729f59016daf9e4996261"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 03312010.zip",
+      "bytes": 8682698,
+      "sha256": "589f9c3df9e2ec5938a7360426fb6446d2fce134bdac80d0ac337b379a2bcc4a"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 03312011.zip",
+      "bytes": 8573536,
+      "sha256": "d3b38b2c265039acc3dc9147d60f5aa0cef7b589295963d0b3d53d0ab8b877f4"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 03312012.zip",
+      "bytes": 9237409,
+      "sha256": "1c718fb015176ebfbcaade79a9b0984a4edfc58b95c762039d08fb8d342b80fb"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 03312013.zip",
+      "bytes": 8998063,
+      "sha256": "5b8af57df1418a31ef27d1a5cdf9fedd28bb58495593e68ef2d1ae2b3ac45197"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 03312014.zip",
+      "bytes": 8923944,
+      "sha256": "571fd57586a109e8a3a4b8200a8d4f3b91042210ae6b2c88bb549953822b6948"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 03312015.zip",
+      "bytes": 8787483,
+      "sha256": "a971134e5d959f9449a4a1e98b0b6fd839fe3a0d816e18383ed4fd98e8329b24"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 03312016.zip",
+      "bytes": 8517435,
+      "sha256": "0d6e0882cb7805d87b2ae8ccd29dae37184068a2065bac9b9309fd3ec86138cd"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 03312017.zip",
+      "bytes": 8019468,
+      "sha256": "2b94ead4f7d00d4b275b8f94b5b96cfdbd68df32bd78e20d345198e08f8b6795"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 03312018.zip",
+      "bytes": 7723369,
+      "sha256": "e8954ff338cdf1b4d7469ead467dd988628eafce97c84296e23318675a7bba24"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 03312019.zip",
+      "bytes": 7340118,
+      "sha256": "fb8ce0076454f7a71817ed7f83a9a5892c0f0d369e4e44a99452a737a5271966"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 03312020.zip",
+      "bytes": 6358229,
+      "sha256": "fd0296cbc4cd4a85fcefe39357555eb7ab89cdfa933910d495b4670b3752726c"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 03312021.zip",
+      "bytes": 6226531,
+      "sha256": "268f19b4efd09dac9b3c9f1bfd9d495b4e382e372c36b46a7e80b03a95539017"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 03312022.zip",
+      "bytes": 6032710,
+      "sha256": "dcb41a103a503536ec2bc5ed6c9041bb1dfff84e4357582b7101d1984d2af8d2"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 03312023.zip",
+      "bytes": 5973050,
+      "sha256": "ee1ada4abf465de9ddd7c582cff7d29b9e207e56c445b638819490725766ac5c"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 06302001.zip",
+      "bytes": 8557286,
+      "sha256": "2efe7ad9e2be715ad55aa906fe0c85055bb580e4db7389a0f404f5f4c40920f7"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 06302002.zip",
+      "bytes": 8582922,
+      "sha256": "6cdbe18bc33e732e8cdacb1493e5bfd158403b8ca185803aee501fcede4c1ca3"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 06302003.zip",
+      "bytes": 8579151,
+      "sha256": "38fc35b058d837c8ced7c5ad1bf84cd027640fece4b18483d0ed7a2b2dd84d55"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 06302004.zip",
+      "bytes": 8428572,
+      "sha256": "0d254fc81baa6ddf0bf420bfbd23847784f18e82e1f8e1c2bbee73c5d6916511"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 06302005.zip",
+      "bytes": 8289085,
+      "sha256": "4b4302fce862534c0c977a34bad3d7127934dbdccf3abb6aaa28eb62909743fb"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 06302006.zip",
+      "bytes": 8446083,
+      "sha256": "5f9d12b62b419111930326393f5e6889ce9d184faa3133b1370774d75ea9e46b"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 06302007.zip",
+      "bytes": 8575145,
+      "sha256": "1ac5013bfbb71282731f6d4a55dbb1d13e6aa9072987da9777d59880150e926a"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 06302008.zip",
+      "bytes": 8624774,
+      "sha256": "843f5e685ee49d8cbd17a83b562b84b62085f6c53b5850169722115f88fef9e5"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 06302009.zip",
+      "bytes": 8918551,
+      "sha256": "21adb939141f23d280aa8a135fc07fee9f5ac24ffd4ac21e177e48f429870bc2"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 06302010.zip",
+      "bytes": 8714355,
+      "sha256": "f7ba9c82287dddd49d85d3db2a6e269524ab792d9ca6fe42375c4d23454bc76c"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 06302011.zip",
+      "bytes": 8721083,
+      "sha256": "ccc4e9a671d90b38afd1f018483106dbc1ded65f5a836ff5bf26e7b2e308e5e7"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 06302012.zip",
+      "bytes": 9320305,
+      "sha256": "9e98a9226d7c90c70bb06cdaf1cdcc336e809ebb9a1aae52e25e239e9c3b1d08"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 06302013.zip",
+      "bytes": 9159152,
+      "sha256": "a97b3ebef53edb054080277f6ec5253ee5134073d0a53c840f5668ff858eae1f"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 06302014.zip",
+      "bytes": 8957025,
+      "sha256": "3cfda96e5e04d78611c3846b2ee870e3cbb6cfa4e2f4393c53e61d1e559830e4"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 06302015.zip",
+      "bytes": 8845893,
+      "sha256": "f6887e487ec985bd86a2382dfcbc1d2817bb343010d9fc3bf241710dc45de70a"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 06302016.zip",
+      "bytes": 8576699,
+      "sha256": "4831339e9072c7d95e7ba7588de1485691c83789b7cc9848b08b428c9ac96f87"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 06302017.zip",
+      "bytes": 8198944,
+      "sha256": "bab661c954c1091ad95cca1c36fc7228f837b1cc10b53964d063dc0800dd40ce"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 06302018.zip",
+      "bytes": 7769899,
+      "sha256": "a495c46133558cfc880ad7fee410a538c50341c5a14ae3196770166f8ff3012a"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 06302019.zip",
+      "bytes": 7523104,
+      "sha256": "557f67e68f5621d41c1b95f15b6e1c30092b12cacd0f548bd9c0672f864ed117"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 06302020.zip",
+      "bytes": 7011224,
+      "sha256": "880b840fed92a3cc2e68129f07cf05b2ec5f6c7e0ace617043112a5d501e4030"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 06302021.zip",
+      "bytes": 6825534,
+      "sha256": "335043212a0efde723a9cd37d16e8b0319f129c968077a112bd1a8aba57f08c2"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 06302022.zip",
+      "bytes": 6653368,
+      "sha256": "97519c398f1909b06082d72b4470711b318806d3a19179727769829b5e81df42"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 06302023.zip",
+      "bytes": 6581108,
+      "sha256": "fca66cba36cde7737ffe186108ca7d506dca971c50071a10b08d7e0019ed4556"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 09302001.zip",
+      "bytes": 8358226,
+      "sha256": "f13fcfb31bb14fcc651c31876167fbecf83960e6a955a44d7c6aaede12d9a66d"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 09302002.zip",
+      "bytes": 8387268,
+      "sha256": "17921653d0fe0b2843528f47666b61360720a63f7e06b3ace7f35bc2408cfb67"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 09302003.zip",
+      "bytes": 8337507,
+      "sha256": "57f3adf6cdac4dbc6713507573767360b115ab0cfa9eafec48d202b53f65cb9a"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 09302004.zip",
+      "bytes": 8178642,
+      "sha256": "0ec02b4f66e0a7452d6d3865c712e5ab6a457179a0184a9cca9f199710958c03"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 09302005.zip",
+      "bytes": 8197214,
+      "sha256": "3f93385601d074b89db14bb51419b3101e9c5fb9573e13d2c8b90490f712b10e"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 09302006.zip",
+      "bytes": 8269568,
+      "sha256": "52bd990d96bd9ecffd9df0ccf829f13510f84f9d49753bec2819b20a7af25c55"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 09302007.zip",
+      "bytes": 8318471,
+      "sha256": "bd41a07e3ab802fa1dfd9f55cb465316f44634efab204cb999cc395bda4a2a37"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 09302008.zip",
+      "bytes": 8441049,
+      "sha256": "0ae0098cf33ba9696348e0faca34d9d088a09dce6d328cbe6db34aff68fed8a3"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 09302009.zip",
+      "bytes": 8679728,
+      "sha256": "ea6ad42ee094065e1ba95a0e4d9547e60215019f1026dbd45bc88e01f4186489"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 09302010.zip",
+      "bytes": 8759207,
+      "sha256": "47169cae8eb0145227a238912362d7ded2a6c683dbfc70d8e64369e3c3f42533"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 09302011.zip",
+      "bytes": 8758502,
+      "sha256": "7e9d057d53bb72706a5fa1484a0cfa1e855b5231846ecd58f614d2535109316e"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 09302012.zip",
+      "bytes": 9349336,
+      "sha256": "d47395ec52a050e5640ba9c347102dfc7dc2f9d305df3fde8bbb767a450c7f1c"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 09302013.zip",
+      "bytes": 9180618,
+      "sha256": "4538417f60455b5705b58ba7d6630abe2a7a80b35696522bd9ffdad83c892793"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 09302014.zip",
+      "bytes": 8943985,
+      "sha256": "16e25db1ec4fd2b8ad46a44a8d658cbd04a71a2b6c6c40323470148efd6f97a4"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 09302015.zip",
+      "bytes": 8833964,
+      "sha256": "a8591c4d2b4d46c81377c1803558c2219ff0660f4ca7bf85f3b335e0bcca78b8"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 09302016.zip",
+      "bytes": 8476997,
+      "sha256": "7935720ac78923c635cae4ccaceea1ea9061e74aee45130b846764b868bff8ea"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 09302017.zip",
+      "bytes": 8029258,
+      "sha256": "9d591dc4a5472cb817adb348bb6b49523a6ef54331f3d70332fb64b24597e90e"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 09302018.zip",
+      "bytes": 7579953,
+      "sha256": "a05180d6387c79310f438337e3b7bd9bfd6c30f65b6b2fb4afd75f5c4e91d80f"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 09302019.zip",
+      "bytes": 6715891,
+      "sha256": "edd8a7ebac42df2f8073bcb5ca136ff0366380f0f51189a43a5cf95610955739"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 09302020.zip",
+      "bytes": 6410804,
+      "sha256": "abdf411d1a8856d53624fb0428877c34001bca84f540a7e904c09dd5750117bd"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 09302021.zip",
+      "bytes": 6258825,
+      "sha256": "ca48d6403cbe32a833a4a43b094986940a45547283ef67149a1d615bdd0e0505"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 09302022.zip",
+      "bytes": 6089730,
+      "sha256": "1d12e84db865c6861c7a07a98af4e5b6a5852bb97901bd8897d258fa2b5da176"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 12312001.zip",
+      "bytes": 8564359,
+      "sha256": "f6cdfd7d9ca4ee7d8dbc487ea41ef5998a0301a5ee00f8058d6ae1da09936bfc"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 12312002.zip",
+      "bytes": 8523905,
+      "sha256": "82cc1b14a6045d7d9f20d71603f49bee36d1daed81c3783b6d303b1112fbe897"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 12312003.zip",
+      "bytes": 8454097,
+      "sha256": "47b65621e0c9c4e9f2247e541e878047290dc76b116fc08b34a82e24c0ebe4fc"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 12312004.zip",
+      "bytes": 8324605,
+      "sha256": "15f43d5cd37db8570cf2766ae403ab722b336c1db1512c2d00b0864cd8999e8d"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 12312005.zip",
+      "bytes": 8443903,
+      "sha256": "3ab8841403fc546d1f2658fac2bb73d8428433cff4f4b78fd78ff14027253b33"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 12312006.zip",
+      "bytes": 8344968,
+      "sha256": "e583a7a3cc673aab39ddbe5d3bc329f7925e58afa3666c23e8b4292dd7428ffd"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 12312007.zip",
+      "bytes": 8479624,
+      "sha256": "e2803df6e6dde0887474fbc3598235c2f5d3c489652511d39b796ed14b831965"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 12312008.zip",
+      "bytes": 8620922,
+      "sha256": "1c1e5c5578f3a7950604df2fd2d166b0849f8eca146b419919f0ef639a6eda9d"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 12312009.zip",
+      "bytes": 8893374,
+      "sha256": "244954f93918211574a4b6ff9904a1e564c2ee571bea67cb610abe4a21df352f"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 12312010.zip",
+      "bytes": 8912663,
+      "sha256": "4d2da023320603585eb3e6ae750e383cf555e272c74111ce54f3fd32225d3845"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 12312011.zip",
+      "bytes": 8953532,
+      "sha256": "25122692264adb8090e7371a1b197015400bd8983e7a4cd815c89a209a234dc7"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 12312012.zip",
+      "bytes": 9457095,
+      "sha256": "f58672e58e3ea2f702da9b9c5ee0f0804d8edf998b4c8abef665a443cc6e746a"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 12312013.zip",
+      "bytes": 9301159,
+      "sha256": "46e9bc70546da136a1d7170e3031a5bec8538c8857955b55fb67b84ba9ecd69a"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 12312014.zip",
+      "bytes": 9051604,
+      "sha256": "32865ed3b3e78f3fc2ff9e24465b7b43b558a6d2175b33d0f1ca9d399885191d"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 12312015.zip",
+      "bytes": 8927826,
+      "sha256": "fe189d41651d518dcb1494475a0ae36abbe08b83161adfdf76dda49735b20475"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 12312016.zip",
+      "bytes": 8601281,
+      "sha256": "b807fd03a5fe431fb0a544cf52ad8d7fe40ff6c855c94c921cb220583a599fcf"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 12312017.zip",
+      "bytes": 8330186,
+      "sha256": "e090e4838b9edb76e5ec99743d4557efcfdd4d1f657f7b39d865ab8be493de38"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 12312018.zip",
+      "bytes": 7915508,
+      "sha256": "fc552e824e4f7e5c198cc84e2d24d2008538ed22cf0c4376f8ac856f34a3982d"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 12312019.zip",
+      "bytes": 7651027,
+      "sha256": "7d9a8a08f3c53484faeffab92c2d7173479f4c99eb9dd47ad412a5debb865fe9"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 12312020.zip",
+      "bytes": 7200522,
+      "sha256": "92a97cd858be21df458c2a45c27141499d1502ec28addc7f9416a6366dd8e153"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 12312021.zip",
+      "bytes": 6997759,
+      "sha256": "3fb5a9a83c39b09f6bbaad68e74ae18274df3353a1543f4bb87527cb4140b797"
+    },
+    {
+      "path": "Data/ChicagoFedCallReports/zips/FFIEC CDR Call Bulk All Schedules 12312022.zip",
+      "bytes": 6901031,
+      "sha256": "7ac414073cba8470af065a3f2057eadd8a6055d1974727e3c99fe696a17fdbe9"
+    },
+    {
+      "path": "Data/MDRM/MDRM_CSV.csv",
+      "bytes": 91490073,
+      "sha256": "23f5d978f0e94a3876699277487f7aa188af9042c37e2f3f4374597a16f1da0a"
+    }
+  ]
+}

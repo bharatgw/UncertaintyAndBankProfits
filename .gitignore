@@ -1,49 +1,35 @@
-# History files
+# Local raw bank records and generated intermediate data
+/Data/ChicagoFedCallReports/
+/Data/ChicagoFedCallReportsLegacy/
+/Data/MDRM/
+/Data/MergerAdjust/
+/Data/finalData/
+/Data/legacyCallReports(73-10).csv
+/Data/newCallReports(01-23).csv
+/Data/bankTreasuryHoldings.csv
+/Data/bankLiqRatio.csv
+
+# Generated analysis outputs
+/outputs/
+
+# Paper
+/Writing/*
+!/Writing/UncertaintyAndBankProfits.pdf
+
+# Local runtimes, downloaded executables and caches
+/x13as/
+.venv/
+.env
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.pytest_cache/
+.ruff_cache/
+.Rproj.user/
 .Rhistory
 .Rapp.history
-
-# Session Data files
 .RData
-.RDataTmp
-
-# User-specific files
-.Ruserdata
-
-# Example code in package build process
-*-Ex.R
-
-# Output files from R CMD build
-/*.tar.gz
-
-# Output files from R CMD check
-/*.Rcheck/
-
-# RStudio files
-.Rproj.user/
-
-# produced vignettes
-vignettes/*.html
-vignettes/*.pdf
-
-# OAuth2 token, see https://github.com/hadley/httr/releases/tag/v0.3
-.httr-oauth
-
-# knitr and R markdown default cache directories
-*_cache/
-/cache/
-
-# Temporary files created by R markdown
-*.utf8.md
-*.knit.md
-
-# R Environment Variables
-.Renviron
-
-# pkgdown site
-docs/
-
-# translation temp files
-po/*~
-
-# RStudio Connect folder
-rsconnect/
+.DS_Store
+/Data/CSV_*.CSV
+/Data/findf_RelSeries_CSA_MacroSeries.csv
+/.r-library/

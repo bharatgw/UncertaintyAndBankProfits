@@ -7,7 +7,7 @@ newCallReports = read.csv("./Data/newCallReports(01-23).csv")
 # Join split legacy and new Call Reports; Observations after 2010Q4 are from the new call reports
 newCallReports = newCallReports %>%
   rename(RSSD9001 = IDRSSD, RSSD9999 = RCON9999) %>%
-  filter(RSSD9999 >= 20110000)
+  filter(RSSD9999 >= 20110000, RSSD9999 <= 20230630)
 
 callReports = legacyCallReports %>%
   bind_rows(newCallReports)
@@ -21,5 +21,6 @@ findf = callReports %>%
 rm(callReports)
 
 # Write the joined unedited call reports dataset
+dir.create("./Data/finalData", recursive = TRUE, showWarnings = FALSE)
 print(dim(findf))
 write.csv(findf, "./Data/finalData/findf_AllSeries.csv")

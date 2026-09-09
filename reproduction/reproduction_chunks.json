@@ -1,0 +1,110 @@
+[
+  {
+    "label": "setup",
+    "purpose": "Create output directories and require the analysis inputs; halt on errors."
+  },
+  {
+    "label": "packages",
+    "purpose": "Load estimation, panel, data-manipulation, and table packages."
+  },
+  {
+    "label": "load-panel",
+    "purpose": "Read the seasonally adjusted bank panel and treasury holdings."
+  },
+  {
+    "label": "filter-panel",
+    "purpose": "Apply bank-variable eligibility, outlier rules, and the 1997 Q2\u20132023 Q2 sample; require 427375 observations."
+  },
+  {
+    "label": "table-1",
+    "purpose": "Compute and export descriptive statistics for Table 1."
+  },
+  {
+    "label": "macro-data",
+    "purpose": "Construct quarterly rate, uncertainty, and macro controls; merge into the bank panel and export figure inputs."
+  },
+  {
+    "label": "table-2-labels",
+    "purpose": "Define labels and control groups for the main profit regressions."
+  },
+  {
+    "label": "table-2",
+    "purpose": "Estimate and export the NIM, NNI, and ROA regressions with term-premium decomposition."
+  },
+  {
+    "label": "table-2-sample-check",
+    "purpose": "Require 420772 observations in each main regression."
+  },
+  {
+    "label": "table-3-labels",
+    "purpose": "Define channel-regression labels and control groups."
+  },
+  {
+    "label": "table-3",
+    "purpose": "Estimate loan-share, loan-provision, maturity-gap, loan-income, and treasury-share channels."
+  },
+  {
+    "label": "subsample-labels",
+    "purpose": "Define profit and control labels for the subsample regressions."
+  },
+  {
+    "label": "subsample-groups",
+    "purpose": "Construct within-quarter maturity-gap and asset-size terciles and the zero-derivatives indicator."
+  },
+  {
+    "label": "table-9",
+    "purpose": "Estimate and export NIM regressions for the full sample and six subsamples."
+  },
+  {
+    "label": "table-10",
+    "purpose": "Estimate and export NNI regressions for the full sample and six subsamples."
+  },
+  {
+    "label": "did-maturity-sample",
+    "purpose": "Select the outer maturity-gap terciles for the interaction regressions."
+  },
+  {
+    "label": "table-4-maturity",
+    "purpose": "Estimate NIM slopes interacted with groups defined by maturity-gap terciles."
+  },
+  {
+    "label": "table-4-size",
+    "purpose": "Estimate NIM slopes interacted with groups defined by asset-size terciles."
+  },
+  {
+    "label": "table-4-derivatives",
+    "purpose": "Estimate NIM slopes interacted with groups defined by interest-rate derivative use."
+  },
+  {
+    "label": "table-4-labels",
+    "purpose": "Define group-interaction labels for NIM."
+  },
+  {
+    "label": "table-4-output",
+    "purpose": "Export Table 4 group-interaction coefficients and standard errors."
+  },
+  {
+    "label": "table-5-maturity",
+    "purpose": "Estimate NNI slopes interacted with groups defined by maturity-gap terciles."
+  },
+  {
+    "label": "table-5-size",
+    "purpose": "Estimate NNI slopes interacted with groups defined by asset-size terciles."
+  },
+  {
+    "label": "table-5-derivatives",
+    "purpose": "Estimate NNI slopes interacted with groups defined by interest-rate derivative use."
+  },
+  {
+    "label": "table-5-labels",
+    "purpose": "Define group-interaction labels for NNI."
+  },
+  {
+    "label": "table-5-output",
+    "purpose": "Export Table 5 group-interaction coefficients and standard errors."
+  },
+  {
+    "label": "session-info",
+    "purpose": "Write R session information for the analysis run."
+  }
+]
